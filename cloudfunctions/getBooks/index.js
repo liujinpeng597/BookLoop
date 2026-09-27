@@ -51,22 +51,21 @@ exports.main = async (event) => {
     }
     const [orderField, orderDir] = SORT_MAP[event.sortBy] || SORT_MAP.newest
 
-    // 并行取当前页与总数，供前端判断是否还有更多
-    const [res, totalRes] = await Promise.all([
-      db.collection('books')
-        .where(query)
-        .orderBy(orderField, orderDir)
-        .skip((page - 1) * pageSize)
-        .limit(pageSize)
-        .get(),
-      db.collection('books').where(query).count()
-    ])
+    // 性能：单次查询取 pageSize 条，hasMore 由条数判断（省掉一次全表 count）；
+    // 列表页用不到 description（最长 500 字），投影剔除以减小传输载荷
+    const res = await db.collection('books')
+      .where(query)
+      .orderBy(orderField, orderDir)
+      .skip((page - 1) * pageSize)
+      .limit(pageSize)
+      .field({ description: false })
+      .get()
 
+    const list = res.data
     return {
       success: true,
-      data: res.data,
-      total: totalRes.total,
-      hasMore: page * pageSize < totalRes.total
+      data: list,
+      hasMore: list.length === pageSize
     }
   } catch (err) {
     console.error('getBooks error:', err)

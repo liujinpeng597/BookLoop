@@ -30,22 +30,19 @@ exports.main = async (event) => {
   }
 
   try {
-    // 并行取当前页与总数，供前端翻页
-    const [res, totalRes] = await Promise.all([
-      db.collection('orders')
-        .where(query)
-        .orderBy('createTime', 'desc')
-        .skip((page - 1) * pageSize)
-        .limit(pageSize)
-        .get(),
-      db.collection('orders').where(query).count()
-    ])
+    // 性能：多取 1 条预读判断翻页，省掉一次全表 count
+    const res = await db.collection('orders')
+      .where(query)
+      .orderBy('createTime', 'desc')
+      .skip((page - 1) * pageSize)
+      .limit(pageSize + 1)
+      .get()
 
+    const list = res.data
     return {
       success: true,
-      data: res.data,
-      total: totalRes.total,
-      hasMore: page * pageSize < totalRes.total
+      data: list.slice(0, pageSize),
+      hasMore: list.length > pageSize
     }
   } catch (err) {
     console.error('getOrders error:', err)

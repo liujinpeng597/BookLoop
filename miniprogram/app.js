@@ -49,6 +49,8 @@ App({
   // 刷新消息 tabBar 未读角标（首页/我的页 onShow 时调用）
   refreshUnreadBadge() {
     Promise.resolve(this.loginPromise).then(() => {
+      // SWR：先用上次结果立即渲染，网络回来后再校正
+      this._applyBadge(wx.getStorageSync('unread_badge_cache') || 0)
       const since = wx.getStorageSync('chat_read_ts') || 0
       wx.cloud.callFunction({
         name: 'getUnreadCount',
@@ -56,11 +58,8 @@ App({
         success: res => {
           if (!(res.result && res.result.success)) return
           const count = res.result.count || 0
-          if (count > 0) {
-            wx.setTabBarBadge({ index: 2, text: count > 99 ? '99+' : String(count), fail: () => {} })
-          } else {
-            wx.removeTabBarBadge({ index: 2, fail: () => {} })
-          }
+          wx.setStorageSync('unread_badge_cache', count)
+          this._applyBadge(count)
         },
         // fail 回调兜底：部分基础库下带 success 的 callFunction 不返回 Promise，.catch 不会触发
         fail: () => {}
@@ -68,9 +67,19 @@ App({
     }).catch(() => {})
   },
 
+  _applyBadge(count) {
+    if (count > 0) {
+      wx.setTabBarBadge({ index: 2, text: count > 99 ? '99+' : String(count), fail: () => {} })
+    } else {
+      wx.removeTabBarBadge({ index: 2, fail: () => {} })
+    }
+  },
+
   // 标记全部消息已读（进入消息页/离开聊天页时调用）：更新本地已读水位并清角标
   markChatsRead() {
     wx.setStorageSync('chat_read_ts', Date.now())
+    // 同步重置角标缓存，避免回到首页时 SWR 用旧数字闪现角标
+    wx.setStorageSync('unread_badge_cache', 0)
     wx.removeTabBarBadge({ index: 2, fail: () => {} })
   }
 })

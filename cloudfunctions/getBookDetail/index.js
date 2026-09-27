@@ -10,15 +10,17 @@ exports.main = async (event) => {
   if (!bookId) return { success: false, msg: '缺少参数' }
 
   try {
-    const book = await safeGetDoc(db, 'books', bookId)
+    // 性能：书籍读取与 view_logs 集合保障并行；写日志与计数并行（串行 5 次 DB 往返 → 3 层）
+    const { OPENID } = cloud.getWXContext()
+    const [book] = await Promise.all([
+      safeGetDoc(db, 'books', bookId),
+      countView !== false ? db.createCollection('view_logs').catch(() => {}) : Promise.resolve()
+    ])
     if (!book) return { success: false, msg: '书籍不存在' }
 
     // 浏览计数副作用默认开启（真实详情页访问）；
     // 订单确认页、管理端编辑页等"非展示型"读取请传 countView: false，避免统计虚高
     if (countView !== false) {
-      const { OPENID } = cloud.getWXContext()
-      try { await db.createCollection('view_logs') } catch (e) { /* 已存在 */ }
-
       // 同一用户 10 分钟内重复查看不重复计数
       const dupRes = await db.collection('view_logs').where({
         bookId,
@@ -27,12 +29,14 @@ exports.main = async (event) => {
       }).count()
 
       if (dupRes.total === 0) {
-        await db.collection('view_logs').add({
-          data: { bookId, openId: OPENID, viewTime: db.serverDate() }
-        })
-        await db.collection('books').doc(bookId).update({
-          data: { views: _.inc(1) }
-        })
+        await Promise.all([
+          db.collection('view_logs').add({
+            data: { bookId, openId: OPENID, viewTime: db.serverDate() }
+          }),
+          db.collection('books').doc(bookId).update({
+            data: { views: _.inc(1) }
+          })
+        ])
       }
     }
 

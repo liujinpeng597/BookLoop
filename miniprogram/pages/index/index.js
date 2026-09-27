@@ -45,12 +45,19 @@ Page({
   },
 
   loadAnnouncement() {
+    // SWR：先用缓存立即渲染，网络回来后覆盖（公告变更频率低）
+    const cached = wx.getStorageSync('announcement_cache')
+    if (cached) this.setData({ announcement: cached })
+
     wx.cloud.callFunction({
       name: 'publishAnnouncement',
       data: { action: 'get' },
       success: res => {
         if (res.result && res.result.success) {
-          this.setData({ announcement: res.result.data || null })
+          const data = res.result.data || null
+          this.setData({ announcement: data })
+          if (data) wx.setStorageSync('announcement_cache', data)
+          else wx.removeStorageSync('announcement_cache')
         }
       },
       fail: () => {}
@@ -62,6 +69,17 @@ Page({
     if (this.data.loading || !this.data.hasMore) return
 
     this.setData({ loading: true })
+
+    const isFirstPage = this.data.page === 1
+    const cacheKey = [this.data.currentCategory, this.data.searchKey || '', this.data.sortBy].join('|')
+
+    // SWR：首屏先用缓存渲染，网络回来后覆盖更新
+    if (override && isFirstPage) {
+      const hit = (wx.getStorageSync('books_cache') || {})[cacheKey]
+      if (hit && hit.list && hit.list.length) {
+        this.setData({ books: hit.list })
+      }
+    }
 
     wx.cloud.callFunction({
       name: 'getBooks',
@@ -87,6 +105,19 @@ Page({
             page: this.data.page + 1,
             loading: false
           })
+
+          // 仅缓存第一页结果（已带成色样式类），供下次首屏秒开；上限 8 个筛选组合
+          if (isFirstPage) {
+            const cache = wx.getStorageSync('books_cache') || {}
+            cache[cacheKey] = { ts: Date.now(), list: newBooks }
+            const keys = Object.keys(cache)
+            if (keys.length > 8) {
+              keys.sort((a, b) => cache[a].ts - cache[b].ts)
+                .slice(0, keys.length - 8)
+                .forEach(k => delete cache[k])
+            }
+            wx.setStorageSync('books_cache', cache)
+          }
         } else {
           this.setData({ loading: false })
           wx.showToast({ title: '拉取数据失败', icon: 'none' })
