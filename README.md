@@ -32,8 +32,8 @@
 
 ### 技术亮点
 
-- **零服务器架构**：26 个云函数 + 云数据库 + 云存储，天然免运维、免域名备案
-- **权限内控**：管理员以 OpenID 白名单形式在 15 个云函数中做服务端鉴权，前端仅做 UI 分流
+- **零服务器架构**：27 个云函数 + 云数据库 + 云存储，天然免运维、免域名备案
+- **权限内控**：管理员 OpenID 白名单集中维护在 `shared/cloud-common.js`（同步脚本一键下发 27 个云函数），前端仅做 UI 分流
 - **并发安全**：下单锁库存、支付原子更新（`where` 条件更新）防超卖 / 重复支付
 - **体验优化**：搜索防抖、分页拉取、`lazyCodeLoading` 按需注入、本地缓存用户资料
 
@@ -55,42 +55,33 @@ BookLoop/
 │   ├── app.js                   # 全局逻辑：云环境初始化、静默登录、身份鉴定
 │   ├── app.json                 # 页面路由、TabBar、窗口配置
 │   ├── utils/
-│   │   └── util.js              # 成色文案、导航栏适配等公共工具
+│   │   ├── util.js              # 成色文案、导航栏适配等公共工具
+│   │   └── constants.js         # 业务常量（状态/分类/成色/默认地址）
 │   ├── assets/                  # TabBar 图标
-│   └── pages/
-│       ├── index/               # 首页：列表 / 分类 / 搜索 / 公告
-│       ├── detail/              # 书籍详情
-│       ├── cart/                # 购物车
-│       ├── order/               # 我的订单
-│       ├── order-detail/        # 订单详情
-│       ├── payment/             # 支付（扫码线下支付）
-│       ├── chat-list/           # 会话列表
-│       ├── chat/                # 聊天窗口
-│       ├── my/                  # 个人中心
-│       ├── admin-books/         # [管理] 图书列表
-│       ├── admin-book-edit/     # [管理] 图书上架 / 编辑（ISBN 抓取）
-│       ├── admin-orders/        # [管理] 订单管理
-│       ├── admin-announcement/  # [管理] 公告管理
-│       └── admin-settings/      # [管理] 系统设置
-├── cloudfunctions/              # 云函数（26 个）
+│   └── pages/                   # 14 个页面（首页/详情/购物车/订单/支付/聊天/管理后台）
+├── cloudfunctions/              # 云函数（27 个，每个目录含 cloud-common.js 公共模块副本）
 │   ├── login/                   # 静默登录，返回 openid 与管理员身份
 │   ├── getBooks/                # 书籍列表（分类 / 关键词 / 分页）
-│   ├── getBookDetail/           # 书籍详情（含浏览计数去重）
-│   ├── addBook/                 # 上架书籍（管理员）
-│   ├── editBook/                # 编辑书籍（管理员）
-│   ├── deleteBook/              # 下架 / 删除（管理员）
+│   ├── getBookDetail/           # 书籍详情（可选浏览计数，countView 参数控制）
+│   ├── addBook/ editBook/ deleteBook/            # 图书管理（管理员）
 │   ├── fetchBookByISBN/         # ISBN 抓取图书信息 + 封面转存（管理员）
-│   ├── addToCart/ getCart/ removeFromCart/      # 购物车
-│   ├── createOrder/ createBatchOrder/           # 单本 / 批量下单（锁库存）
-│   ├── getOrders/ getOrderDetail/ checkOrderAccess/  # 订单查询 / 权限校验
-│   ├── updateOrderStatus/       # 订单状态流转（管理员，含回滚库存）
-│   ├── deleteOrder/             # 删除订单（买家 / 管理员）
-│   ├── payOrder/                # 支付确认（原子防重）
+│   ├── addToCart/ getCart/ removeFromCart/       # 购物车（服务端回读书籍数据）
+│   ├── createOrder/ createBatchOrder/            # 单本 / 批量下单（原子锁库存）
+│   ├── getOrders/ getOrderDetail/ checkOrderAccess/  # 订单查询（分页）/ 权限校验
+│   ├── updateOrderStatus/       # 订单状态机（管理员流转 + 买家自助取消未支付订单）
+│   ├── deleteOrder/             # 逻辑删除订单（买家 / 管理员）
+│   ├── payOrder/                # 买家自报转账（管理员推进状态时确认收款）
 │   ├── sendChatMessage/ getChatMessages/ getChatConversations/ clearChat/  # 聊天
-│   ├── saveUserProfile/         # 用户资料
+│   ├── saveUserProfile/         # 用户资料（以 openid 为 _id 防并发重复）
 │   ├── publishAnnouncement/     # 公告发布 / 查询（管理员）
-│   └── getSettings/ saveSetting/  # 系统设置
+│   ├── getSettings/ saveSetting/  # 系统设置（公开读取白名单）
+│   └── cleanupLogs/             # 定时触发（每日 4 点）清理过期浏览日志
+├── shared/
+│   └── cloud-common.js          # 管理员白名单 + 业务枚举 + 通用工具（唯维护点）
+├── scripts/
+│   └── sync-shared.js           # 将 shared/cloud-common.js 同步到所有云函数目录
 ├── project.config.json          # 微信开发者工具项目配置
+├── CODE_REVIEW.md               # 代码审查报告（含本次修复说明）
 └── README.md
 ```
 
@@ -132,7 +123,8 @@ wx.cloud.init({
 
 在开发者工具中，右键 `cloudfunctions` 目录下**每个函数文件夹** →「上传并部署：云端安装依赖（不上传 node_modules）」。
 
-> 共 26 个函数，需要逐个部署（也可以右键 `cloudfunctions` 根目录批量上传）。
+> 共 27 个函数，需要逐个部署（也可以右键 `cloudfunctions` 根目录批量上传）。
+> 其中 `cleanupLogs` 带定时触发器（每日 4 点清理过期浏览日志），部署时会提示创建触发器，选择"确认"即可。
 
 ### 5. 创建数据库集合
 
@@ -153,12 +145,20 @@ wx.cloud.init({
 
 ### 6. 配置管理员
 
-所有涉及管理的云函数中都有管理员白名单，把其中的 OpenID 替换为你自己的（共 15 处，值为同一 OpenID）：
+管理员 OpenID 白名单**集中维护**在 `shared/cloud-common.js`（云函数侧）和 `miniprogram/utils/constants.js`（前端业务常量）：
 
 ```js
-// 以 cloudfunctions/login/index.js 为例
+// shared/cloud-common.js —— 唯一维护点
 const ADMIN_OPENIDS = ['你的OpenID']
 ```
+
+修改后运行同步脚本，把公共模块下发到全部云函数目录：
+
+```bash
+node scripts/sync-shared.js
+```
+
+然后在微信开发者工具中重新部署各个云函数即可。
 
 > 获取 OpenID：部署 `login` 云函数后在小程序里触发登录，控制台日志中即可看到 `openid`；或在云开发数据库任意一条你自己的数据中查看。
 
@@ -169,10 +169,17 @@ const ADMIN_OPENIDS = ['你的OpenID']
 ## 📖 业务流程
 
 ```
-买家浏览/搜索 → 加入购物车/直接下单 → 扫码线下支付 → 点击"我已支付"
-     ↓                                    ↓
-管理员订单管理确认到账 → 订单完成 → 书籍状态置为已售 → 双方可围绕订单聊天沟通面交
+买家浏览/搜索 → 加购/直接下单（原子锁库存）
+     │                ├─ 反悔？待交接且未支付 → 订单详情页自助取消（自动释放库存+系统通知）
+     ↓                ↓
+扫码线下转账 → 点击"我已完成支付"（自报 paid，标记"待卖家核实"）
+     ↓
+管理员订单后台：核对到账 → 发货/去交接（写入收款确认）→ 确认交易完成
+     ↓
+双方可围绕订单聊天沟通面交；书籍状态流转全程由服务端状态机保障
 ```
+
+> 支付说明：线下扫码场景中 `paid` 表示买家自报已转账，管理员把订单推进到"配送中/已完成"时才写入 `adminConfirmedPaid`（收款确认）。管理端订单卡片对两种状态有醒目区分，防止仅凭买家自报发货。
 
 ---
 

@@ -1,5 +1,6 @@
 const cloud = require('wx-server-sdk')
 const https = require('https')
+const { isAdminOpenid } = require('./cloud-common')
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 
@@ -58,11 +59,15 @@ async function fetchAuthors(authorRefs) {
 }
 
 exports.main = async (event) => {
+  // ISBN 查询仅供管理员上架使用：无鉴权会被恶意刷调用量，
+  // 且每次命中都会向云存储写入封面文件（存储与调用配额都产生实际费用）
+  if (!isAdminOpenid(cloud.getWXContext().OPENID)) return { success: false, msg: '无权限' }
+
   const { isbn } = event
   if (!isbn) return { success: false, msg: '缺少ISBN' }
 
   const clean = isbn.replace(/[^0-9Xx]/g, '')
-  if (!clean || clean.length < 10) return { success: false, msg: 'ISBN格式不正确' }
+  if (!clean || clean.length < 10 || clean.length > 17) return { success: false, msg: 'ISBN格式不正确' }
 
   let book = null
 

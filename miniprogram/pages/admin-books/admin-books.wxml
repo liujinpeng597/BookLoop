@@ -58,5 +58,8 @@
       </view>
 
     </view>
+    <view class="load-more" wx:if="{{books.length > 0}}">
+      {{loadingMore ? '加载中...' : (hasMore ? '上拉加载更多' : '没有更多书籍了')}}
+    </view>
   </view>
 </view>

@@ -17,10 +17,11 @@
       </text>
       <text class="status-text">{{statusMap[order.status]}}</text>
       <text class="status-no">订单号：{{order.orderNo}}</text>
-      <view class="pay-status-badge {{order.paid ? 'paid' : 'unpaid'}}">
-        {{order.paid ? '已支付' : '未支付'}}
+      <view class="pay-status-badge {{order.paid ? (order.adminConfirmedPaid ? 'paid' : 'claim') : 'unpaid'}}">
+        {{order.payStatusText}}
       </view>
       <view wx:if="{{!order.paid && order.status === 'pending'}}" class="pay-now-btn" bindtap="onPayTap">去支付 →</view>
+      <view wx:if="{{canCancel}}" class="cancel-btn" bindtap="onCancelOrder">取消订单</view>
     </view>
 
     <!-- 书籍信息 -->

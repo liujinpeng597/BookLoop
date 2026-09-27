@@ -105,6 +105,19 @@ page {
   background: #fef3c7;
   color: #d97706;
 }
+/* 买家自报已转账、待卖家核实 */
+.pay-tag.claim {
+  background: #ffedd5;
+  color: #ea580c;
+}
+
+/* 列表底部加载提示 */
+.load-more {
+  text-align: center;
+  color: #94a3b8;
+  font-size: 24rpx;
+  padding: 16rpx 0 40rpx;
+}
 
 /* 书籍信息展示块 */
 .order-book { 

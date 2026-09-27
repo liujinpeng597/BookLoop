@@ -82,8 +82,12 @@ Page({
           wx.cloud.callFunction({
             name: 'publishAnnouncement',
             data: { action: 'delete', id },
-            success: () => {
-              wx.showToast({ title: '已删除', icon: 'success' })
+            success: res => {
+              if (res.result && res.result.success) {
+                wx.showToast({ title: '已删除', icon: 'success' })
+              } else {
+                wx.showToast({ title: (res.result && res.result.msg) || '删除失败', icon: 'none' })
+              }
               this.loadAnnouncements()
             },
             fail: () => wx.showToast({ title: '删除失败', icon: 'none' })

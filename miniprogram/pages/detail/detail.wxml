@@ -48,7 +48,7 @@
           🏃 校园自提 (线下交接，免填地址)
         </label>
         <view class="pickup-address" wx:if="{{deliveryType === 'pickup'}}">
-          卖家指定地点：{{book.pickupAddress || '西区七公寓512'}}
+          卖家指定地点：{{book.pickupAddress}}
         </view>
         
         <label class="radio-label">

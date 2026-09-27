@@ -1,5 +1,13 @@
-page { 
-  background-color: #f1f5f9; 
+page {
+  background-color: #f1f5f9;
+}
+
+/* 列表底部加载提示 */
+.load-more {
+  text-align: center;
+  color: #94a3b8;
+  font-size: 24rpx;
+  padding: 16rpx 0 40rpx;
 }
 
 /* ================= 导航栏 ================= */

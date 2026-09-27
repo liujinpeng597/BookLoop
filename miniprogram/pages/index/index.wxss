@@ -197,6 +197,7 @@ page {
 .cond-jiuchenxin { background: rgba(59, 130, 246, 0.9); color: #fff; }
 .cond-bachenxin { background: rgba(245, 158, 11, 0.9); color: #fff; }
 .cond-qichenxin { background: rgba(239, 68, 68, 0.9); color: #fff; }
+.cond-other { background: rgba(100, 116, 139, 0.9); color: #fff; }
 
 .book-info {
   padding: 20rpx;

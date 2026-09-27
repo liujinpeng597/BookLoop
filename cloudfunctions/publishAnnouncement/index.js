@@ -1,8 +1,10 @@
 const cloud = require('wx-server-sdk')
+const { isAdminOpenid } = require('./cloud-common')
+
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()
 
-const ADMIN_OPENIDS = ['oBpJc7B-M09rkIGtZNQNn2CgHDN8']
+const MAX_CONTENT_LEN = 500
 
 exports.main = async (event) => {
   const { content, action } = event
@@ -19,11 +21,18 @@ exports.main = async (event) => {
       }
       return { success: true, data: res.data || [] }
     } catch (e) {
-      return { success: true, data: action === 'get' ? null : [] }
+      // 集合不存在视为无公告；其余错误如实返回失败（而非伪装成空数据）
+      const msg = String((e && (e.errMsg || e.message)) || '')
+      if (/not exist/i.test(msg)) {
+        try { await db.createCollection('announcements') } catch (_) { /* 已存在 */ }
+        return { success: true, data: action === 'get' ? null : [] }
+      }
+      console.error('publishAnnouncement query error:', e)
+      return { success: false, msg: '公告加载失败' }
     }
   }
 
-  if (!ADMIN_OPENIDS.includes(cloud.getWXContext().OPENID)) {
+  if (!isAdminOpenid(cloud.getWXContext().OPENID)) {
     return { success: false, msg: '无权限' }
   }
 
@@ -33,15 +42,17 @@ exports.main = async (event) => {
 
     if (action === 'delete') {
       const { id } = event
+      if (!id) return { success: false, msg: '缺少公告ID' }
       await db.collection('announcements').doc(id).remove()
       return { success: true }
     }
 
-    if (!content || !content.trim()) return { success: false, msg: '公告内容不能为空' }
+    if (!content || !String(content).trim()) return { success: false, msg: '公告内容不能为空' }
+    const text = String(content).trim().substring(0, MAX_CONTENT_LEN)
 
     await db.collection('announcements').add({
       data: {
-        content: content.trim(),
+        content: text,
         createTime: db.serverDate()
       }
     })
@@ -49,6 +60,7 @@ exports.main = async (event) => {
     // 只保留最新 5 条，删除旧的
     const all = await db.collection('announcements')
       .orderBy('createTime', 'desc')
+      .limit(10)
       .get()
     if (all.data.length > 5) {
       const toDelete = all.data.slice(5)
@@ -59,6 +71,7 @@ exports.main = async (event) => {
 
     return { success: true }
   } catch (e) {
-    return { success: false, msg: e.message || '发布失败' }
+    console.error('publishAnnouncement error:', e)
+    return { success: false, msg: '发布失败' }
   }
 }

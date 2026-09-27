@@ -1,5 +1,6 @@
 const app = getApp()
 const { getNavBarInfo } = require('../../utils/util')
+const { DELIVERY_FEE_PER_BOOK } = require('../../utils/constants')
 
 Page({
   data: {
@@ -39,7 +40,7 @@ Page({
   computeTotal() {
     const { totalPrice, deliveryType, books, isCart } = this.data
     const bookCount = isCart ? books.length : 1
-    const deliveryFee = deliveryType === 'delivery' ? bookCount : 0
+    const deliveryFee = deliveryType === 'delivery' ? bookCount * DELIVERY_FEE_PER_BOOK : 0
     const finalTotal = (totalPrice + deliveryFee).toFixed(2)
     this.setData({ deliveryFee, finalTotal })
   },
@@ -48,7 +49,8 @@ Page({
     wx.showLoading({ title: '加载中...' })
     wx.cloud.callFunction({
       name: 'getBookDetail',
-      data: { bookId: this.bookId },
+      // 订单确认页不是展示型访问，不统计浏览量
+      data: { bookId: this.bookId, countView: false },
       success: res => {
         wx.hideLoading()
         const book = res.result.data
@@ -169,16 +171,14 @@ Page({
       return
     }
 
-    // 单本书
+    // 单本书：只传必要字段，价格/书名/封面由服务端回读；
+    // 自提订单的取货地址也由服务端从书籍记录写入
     const book = targetBooks[0]
-    const finalAddr = deliveryType === 'delivery' ? address : (book.pickupAddress || '西区七公寓512')
+    const finalAddr = deliveryType === 'delivery' ? address : ''
     wx.cloud.callFunction({
       name: 'createOrder',
       data: {
         bookId: book._id,
-        bookTitle: book.title,
-        bookCover: book.coverUrl,
-        price: book.price,
         deliveryType,
         buyerName: name,
         buyerPhone: phone,

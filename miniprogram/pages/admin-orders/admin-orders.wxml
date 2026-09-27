@@ -32,7 +32,7 @@
       <view class="order-header">
         <text class="order-no">单号: {{item.orderNo}}</text>
         <text class="order-status status-{{item.status}}">{{statusMap[item.status]}}</text>
-        <text class="pay-tag {{item.paid ? 'paid' : 'unpaid'}}">{{item.paid ? '已付' : '待付'}}</text>
+        <text class="pay-tag {{item.payClass}}">{{item.payText}}</text>
       </view>
 
       <!-- 多书订单 -->
@@ -78,6 +78,9 @@
         <view wx:if="{{item.status === 'completed' || item.status === 'cancelled'}}" class="action-btn btn-delete" data-id="{{item._id}}" catchtap="onDeleteOrder">清理订单</view>
       </view>
       
+    </view>
+    <view class="load-more" wx:if="{{orders.length > 0}}">
+      {{loadingMore ? '加载中...' : (hasMore ? '上拉加载更多' : '没有更多订单了')}}
     </view>
   </view>
 </view>

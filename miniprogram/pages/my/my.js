@@ -1,5 +1,6 @@
 const app = getApp()
 const { getNavBarInfo } = require('../../utils/util')
+const { STATUS_MAP } = require('../../utils/constants')
 
 Page({
   data: {
@@ -9,13 +10,11 @@ Page({
     avatarUrl: '',
     nickName: '',
     loading: false,
+    loadingMore: false,
     orders: [],
-    statusMap: {
-      pending: '待交接',
-      shipped: '配送中',
-      completed: '交易完成',
-      cancelled: '已取消'
-    }
+    page: 1,
+    hasMore: false,
+    statusMap: STATUS_MAP
   },
 
   onLoad() {
@@ -110,24 +109,35 @@ Page({
     }).catch(() => {})
   },
 
-  loadMyOrders() {
-    this.setData({ loading: true })
-    
+  // 我的订单：服务端分页加载（每页 20 条），append=true 时加载下一页
+  loadMyOrders(append = false) {
+    const page = append ? this.data.page + 1 : 1
+    if (append) this.setData({ loadingMore: true })
+    else this.setData({ loading: true })
+
+    // 注：管理员身份由服务端根据 OPENID 判定，无需（也不应）传 isAdmin
     wx.cloud.callFunction({
       name: 'getOrders',
-      data: { isAdmin: false }, 
+      data: { page, pageSize: 20 },
       success: res => {
         if (res.result && res.result.success) {
-          this.setData({ orders: res.result.data || [] })
+          const orders = res.result.data || []
+          this.setData({
+            orders: append ? this.data.orders.concat(orders) : orders,
+            page,
+            hasMore: !!res.result.hasMore,
+            loading: false,
+            loadingMore: false
+          })
         } else {
+          this.setData({ loading: false, loadingMore: false })
           wx.showToast({ title: '加载订单失败', icon: 'none' })
         }
-        this.setData({ loading: false })
       },
       fail: err => {
-        console.error('获取我的订单失败', err)
+        console.error('获取我的订单失败:', err)
+        this.setData({ loading: false, loadingMore: false })
         wx.showToast({ title: '网络开小差了', icon: 'none' })
-        this.setData({ loading: false })
       },
       complete: () => {
         wx.stopPullDownRefresh()
@@ -135,7 +145,14 @@ Page({
     })
   },
 
-  // 🌟 新增：用户端彻底删除已完成订单记录
+  // 触底加载更多订单
+  onReachBottom() {
+    if (this.data.isAdmin || this.data.loading || this.data.loadingMore) return
+    if (this.data.hasMore) {
+      this.loadMyOrders(true)
+    }
+  },
+
   onOrderTap(e) {
     const orderId = e.currentTarget.dataset.id
     if (orderId) {
@@ -144,16 +161,16 @@ Page({
   },
 
   onDeleteOrder(e) {
-    const orderId = e.currentTarget.dataset.id || e.currentTarget.dataset.orderId;
+    const orderId = e.currentTarget.dataset.id || e.currentTarget.dataset.orderId
 
     if (!orderId) {
-      wx.showToast({ title: '前端未获取到订单ID', icon: 'none' });
-      return;
+      wx.showToast({ title: '前端未获取到订单ID', icon: 'none' })
+      return
     }
 
     wx.showModal({
       title: '提示',
-      content: '确定要删除这条订单记录吗？',
+      content: '确定要删除这条订单记录吗？（待处理订单请先在订单详情中取消）',
       success: res => {
         if (res.confirm) {
           wx.showLoading({ title: '正在删除...' })
@@ -169,7 +186,7 @@ Page({
                 wx.showToast({ title: '删除成功', icon: 'success' })
                 this.loadMyOrders()
               } else {
-                wx.showToast({ title: result.result.msg || '删除失败', icon: 'none' })
+                wx.showToast({ title: (result.result && result.result.msg) || '删除失败', icon: 'none' })
               }
             },
             fail: () => {
@@ -190,16 +207,16 @@ Page({
     }
   },
 
-  onAdminPublish() { 
-    wx.navigateTo({ url: '/pages/admin-book-edit/admin-book-edit' }) 
+  onAdminPublish() {
+    wx.navigateTo({ url: '/pages/admin-book-edit/admin-book-edit' })
   },
-  
-  onAdminOrders() { 
-    wx.navigateTo({ url: '/pages/admin-orders/admin-orders' }) 
+
+  onAdminOrders() {
+    wx.navigateTo({ url: '/pages/admin-orders/admin-orders' })
   },
-    
+
   onAdminBooks() {
-     wx.navigateTo({ url: '/pages/admin-books/admin-books' })
+    wx.navigateTo({ url: '/pages/admin-books/admin-books' })
   },
   onAdminAnnouncement() {
     wx.navigateTo({ url: '/pages/admin-announcement/admin-announcement' })

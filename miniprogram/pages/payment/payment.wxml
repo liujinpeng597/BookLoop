@@ -16,9 +16,9 @@
       <view class="success-icon-wrap">
         <text class="success-icon">✓</text>
       </view>
-      <text class="success-title">支付成功</text>
+      <text class="success-title">已通知卖家</text>
       <text class="success-amount">¥{{totalAmount}}</text>
-      <text class="success-hint">卖家将尽快处理您的订单</text>
+      <text class="success-hint">卖家核实收款后将尽快处理您的订单</text>
       <view class="success-btn" bindtap="onViewOrder">查看订单详情</view>
     </view>
   </block>

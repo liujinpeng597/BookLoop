@@ -121,6 +121,9 @@
           <view class="btn-delete" data-id="{{item._id}}" catchtap="onDeleteOrder">删除记录</view>
         </view>
       </view>
+      <view class="load-more" wx:if="{{orders.length > 0}}">
+        {{loadingMore ? '加载中...' : (hasMore ? '上拉加载更多' : '没有更多订单了')}}
+      </view>
     </view>
   </block>
 

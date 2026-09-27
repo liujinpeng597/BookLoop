@@ -1,8 +1,8 @@
 const cloud = require('wx-server-sdk')
+const { isAdminOpenid } = require('./cloud-common')
+
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()
-
-const ADMIN_OPENIDS = ['oBpJc7B-M09rkIGtZNQNn2CgHDN8']
 
 // 清除指定会话(chatId)下的所有聊天消息
 exports.main = async (event) => {
@@ -11,7 +11,7 @@ exports.main = async (event) => {
 
   if (!chatId) return { success: false, msg: '参数缺失' }
 
-  const isAdmin = ADMIN_OPENIDS.includes(OPENID)
+  const isAdmin = isAdminOpenid(OPENID)
   // 普通用户只能清除自己的聊天，管理员可清除任意会话
   if (!isAdmin && chatId !== OPENID) return { success: false, msg: '无权操作' }
 

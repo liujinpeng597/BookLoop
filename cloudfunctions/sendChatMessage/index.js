@@ -1,16 +1,17 @@
 const cloud = require('wx-server-sdk')
+const { isAdminOpenid } = require('./cloud-common')
+
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()
-
-const ADMIN_OPENIDS = ['oBpJc7B-M09rkIGtZNQNn2CgHDN8']
 
 exports.main = async (event) => {
   const { chatId, content, msgType, orders } = event
   const { OPENID } = cloud.getWXContext()
 
-  const isAdmin = ADMIN_OPENIDS.includes(OPENID)
+  const isAdmin = isAdminOpenid(OPENID)
 
   if (!chatId) return { success: false, msg: '参数缺失' }
+  // 普通用户只能在自己的聊天室（chatId = 自己的 openid）发言；管理员可回复任意会话
   if (!isAdmin && chatId !== OPENID) return { success: false, msg: '无权操作' }
 
   // 订单分享消息
@@ -22,11 +23,17 @@ exports.main = async (event) => {
 
     // 校验所有订单都属于发送者，并用服务端数据构建分享内容（防止伪造价格/标题）
     try {
-      const orderIds = orders.map(o => o.orderId).filter(Boolean)
+      const orderIds = orders.map(o => o && o.orderId).filter(Boolean)
+      if (orderIds.length === 0) return { success: false, msg: '请选择订单' }
+
       const orderRes = await db.collection('orders').where({
         _id: db.command.in(orderIds),
         buyerOpenId: OPENID
       }).get()
+
+      if (!orderRes.data || orderRes.data.length === 0) {
+        return { success: false, msg: '无有效订单' }
+      }
 
       const validOrders = orderRes.data.map(o => ({
         orderId: o._id,
@@ -39,13 +46,11 @@ exports.main = async (event) => {
         isBatch: !!o.isBatch
       }))
 
-      if (validOrders.length === 0) return { success: false, msg: '无有效订单' }
-
       await db.collection('chat_messages').add({
         data: {
           chatId,
           fromOpenId: OPENID,
-          content: content || '分享了订单',
+          content: String(content || '分享了订单').substring(0, 100),
           type: 'order_share',
           orders: validOrders,
           createTime: db.serverDate()
@@ -53,6 +58,7 @@ exports.main = async (event) => {
       })
       return { success: true }
     } catch (e) {
+      console.error('sendChatMessage order_share error:', e)
       return { success: false, msg: '发送失败' }
     }
   }
@@ -77,6 +83,7 @@ exports.main = async (event) => {
     })
     return { success: true }
   } catch (e) {
+    console.error('sendChatMessage error:', e)
     return { success: false, msg: '发送失败' }
   }
 }

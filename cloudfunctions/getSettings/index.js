@@ -1,10 +1,15 @@
 const cloud = require('wx-server-sdk')
+
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()
+
+// 允许匿名读取的配置键白名单（新增敏感配置时切勿加入此列表）
+const PUBLIC_KEYS = ['paymentQrcode']
 
 exports.main = async (event) => {
   const { key } = event
   if (!key) return { success: false, msg: '缺少 key' }
+  if (!PUBLIC_KEYS.includes(key)) return { success: false, msg: '无效配置' }
 
   try {
     const res = await db.collection('settings').where({ key }).get()
@@ -21,7 +26,7 @@ exports.main = async (event) => {
             value = tempRes.fileList[0].tempFileURL
           }
         } catch (e) {
-          console.log('getTempFileURL 转换失败，返回原始值:', e.message)
+          console.error('getTempFileURL 转换失败:', e)
         }
       }
 
@@ -29,7 +34,13 @@ exports.main = async (event) => {
     }
     return { success: true, data: null }
   } catch (err) {
-    console.log('getSettings 查询失败:', err.message)
-    return { success: true, data: null }
+    // 集合不存在视为未配置；其余错误如实返回失败
+    const msg = String((err && (err.errMsg || err.message)) || '')
+    if (/not exist/i.test(msg)) {
+      try { await db.createCollection('settings') } catch (_) { /* 已存在 */ }
+      return { success: true, data: null }
+    }
+    console.error('getSettings error:', err)
+    return { success: false, msg: '配置读取失败' }
   }
 }

@@ -33,16 +33,23 @@ Page({
     wx.cloud.callFunction({
       name: 'getCart',
       success: res => {
-        const items = (res.result && res.result.data || []).map(item => ({
-          ...item,
-          checked: true
-        }))
-        this.setData({ items, loading: false, allChecked: true })
-        this.updateSummary()
+        if (res.result && res.result.success) {
+          const items = (res.result.data || []).map(item => ({
+            ...item,
+            checked: true
+          }))
+          this.setData({ items, loading: false, allChecked: true })
+          this.updateSummary()
+        } else {
+          // 真实错误如实提示，不再伪装成空购物车
+          this.setData({ items: [], loading: false })
+          wx.showToast({ title: (res.result && res.result.msg) || '购物车加载失败', icon: 'none' })
+        }
       },
       fail: err => {
         console.error('加载购物车失败:', err)
         this.setData({ loading: false })
+        wx.showToast({ title: '网络异常，请下拉重试', icon: 'none' })
       },
       complete: () => wx.stopPullDownRefresh()
     })
@@ -87,14 +94,18 @@ Page({
           wx.cloud.callFunction({
             name: 'removeFromCart',
             data: { cartId: item._id },
-            success: () => {
-              const items = this.data.items.filter((_, i) => i !== index)
-              const allChecked = items.length ? items.every(i => i.checked) : true
-              this.setData({ items, allChecked })
-              this.updateSummary()
-              wx.showToast({ title: '已移除', icon: 'success' })
+            success: res => {
+              if (res.result && res.result.success) {
+                const items = this.data.items.filter((_, i) => i !== index)
+                const allChecked = items.length ? items.every(i => i.checked) : true
+                this.setData({ items, allChecked })
+                this.updateSummary()
+                wx.showToast({ title: '已移除', icon: 'success' })
+              } else {
+                wx.showToast({ title: (res.result && res.result.msg) || '操作失败', icon: 'none' })
+              }
             },
-            fail: () => wx.showToast({ title: '操作失败', icon: 'none' })
+            fail: () => wx.showToast({ title: '网络异常', icon: 'none' })
           })
         }
       }

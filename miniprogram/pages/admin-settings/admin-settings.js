@@ -34,6 +34,8 @@ Page({
             qrcodeUrl: doc.value,
             hasQrcode: true
           })
+        } else if (res.result && !res.result.success) {
+          wx.showToast({ title: res.result.msg || '收款码配置读取失败', icon: 'none' })
         }
         this.setData({ loading: false })
       },
@@ -45,12 +47,14 @@ Page({
   },
 
   onUploadQrcode() {
-    wx.chooseImage({
+    // wx.chooseImage 已废弃，统一使用 wx.chooseMedia
+    wx.chooseMedia({
       count: 1,
+      mediaType: ['image'],
       sizeType: ['compressed'],
       sourceType: ['album', 'camera'],
       success: res => {
-        const tempPath = res.tempFilePaths[0]
+        const tempPath = res.tempFiles[0].tempFilePath
         wx.showLoading({ title: '上传中...' })
         const cloudPath = `qrcode/payment_${Date.now()}.jpg`
 

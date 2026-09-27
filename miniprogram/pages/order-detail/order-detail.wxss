@@ -85,6 +85,11 @@ page {
   background: #fef3c7;
   color: #d97706;
 }
+/* 买家已自报转账、待卖家核实 */
+.pay-status-badge.claim {
+  background: #ffedd5;
+  color: #ea580c;
+}
 
 .pay-now-btn {
   margin-top: 20rpx;
@@ -94,6 +99,17 @@ page {
   font-weight: 600;
   padding: 16rpx 48rpx;
   border-radius: 48rpx;
+}
+
+/* 买家自助取消订单（待交接且未支付时显示） */
+.cancel-btn {
+  margin-top: 12rpx;
+  background: #fff;
+  color: #64748b;
+  font-size: 26rpx;
+  padding: 12rpx 40rpx;
+  border-radius: 40rpx;
+  border: 1rpx solid #e2e8f0;
 }
 
 /* 信息卡片 */

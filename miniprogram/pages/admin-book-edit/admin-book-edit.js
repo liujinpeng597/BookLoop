@@ -1,4 +1,5 @@
 const { getNavBarInfo } = require('../../utils/util')
+const { CATEGORY_LIST, CONDITION_LIST, DEFAULT_PICKUP_ADDRESS } = require('../../utils/constants')
 
 Page({
   data: {
@@ -15,9 +16,9 @@ Page({
     description: '',
     coverUrl: '',
     tempCoverUrl: '',
-    pickupAddress: '西区七公寓512',
-    categories: ['教材', '其他', '考研', '文学', '生活'],
-    conditions: ['全新', '九成新', '八成新', '七成新']
+    pickupAddress: DEFAULT_PICKUP_ADDRESS,
+    categories: CATEGORY_LIST,
+    conditions: CONDITION_LIST
   },
 
   onLoad(options) {
@@ -29,12 +30,12 @@ Page({
     }
   },
 
-  // 获取要编辑的书籍原有信息
+  // 获取要编辑的书籍原有信息（管理端读取，不统计浏览量）
   loadBookDetail() {
     wx.showLoading({ title: '加载书籍信息' })
     wx.cloud.callFunction({
-      name: 'getBookDetail', 
-      data: { bookId: this.data.bookId },
+      name: 'getBookDetail',
+      data: { bookId: this.data.bookId, countView: false },
       success: res => {
         wx.hideLoading()
         if (res.result && res.result.data) {
@@ -49,7 +50,7 @@ Page({
             condition: b.condition || '八成新', 
             coverUrl: b.coverUrl || '',
             description: b.description || b.desc || '', 
-            pickupAddress: b.pickupAddress || '西区七公寓512'
+            pickupAddress: b.pickupAddress || DEFAULT_PICKUP_ADDRESS
           })
         }
       },
@@ -115,7 +116,8 @@ Page({
         })
       },
       fail: err => {
-        if (err.errMsg.indexOf('cancel') === -1) {
+        // 用户主动取消扫码不算错误
+        if (err && err.errMsg && err.errMsg.indexOf('cancel') === -1) {
           wx.showToast({ title: '扫码失败，请重试', icon: 'none' })
         }
       }
@@ -155,7 +157,7 @@ Page({
       return wx.showToast({ title: '核心信息未填写完整', icon: 'none' })
     }
 
-    wx.showLoading({ title: '正在加密上传...', mask: true })
+    wx.showLoading({ title: '正在上传...', mask: true })
 
     // 2. 处理图片逻辑：如果有新图，就上传新图；没选新图，就用原来的 coverUrl
     const uploadTask = d.tempCoverUrl ? this.uploadFile(d.tempCoverUrl) : Promise.resolve({ fileID: d.coverUrl })

@@ -1,5 +1,6 @@
 const app = getApp()
 const { condToClass, getNavBarInfo } = require('../../utils/util')
+const { DEFAULT_PICKUP_ADDRESS } = require('../../utils/constants')
 
 Page({
   data: {
@@ -35,8 +36,9 @@ Page({
           if (book.originalPrice && book.originalPrice > book.price) {
             book.savedAmount = parseFloat((book.originalPrice - book.price).toFixed(2))
           }
-          
+
           book.condClass = condToClass(book.condition)
+          book.pickupAddress = book.pickupAddress || DEFAULT_PICKUP_ADDRESS
         }
         this.setData({ book, loading: false })
       },
@@ -73,7 +75,7 @@ Page({
     })
   },
 
-  // 🌟 核心：普通用户点击“立即购买”，携带书籍 ID 和选中的配送方式去订单页
+  // 🌟 核心：普通用户点击"加购"，只传 bookId，其余字段由服务端回读（防伪造展示数据）
   onAddCart() {
     const book = this.data.book
     if (!book || book.status !== 'on_sale') return
@@ -82,14 +84,7 @@ Page({
       wx.showLoading({ title: '加入中...' })
       wx.cloud.callFunction({
         name: 'addToCart',
-        data: {
-          bookId: book._id,
-          title: book.title,
-          coverUrl: book.coverUrl || '',
-          price: book.price,
-          condition: book.condition || '',
-          pickupAddress: book.pickupAddress || ''
-        },
+        data: { bookId: book._id },
         success: res => {
           wx.hideLoading()
           if (res.result && res.result.success) {
@@ -109,7 +104,7 @@ Page({
   },
 
   onBuyTap() {
-    if (this.data.book.status !== 'on_sale') {
+    if (!this.data.book || this.data.book.status !== 'on_sale') {
       return wx.showToast({ title: '手慢了，该书已售出', icon: 'none' })
     }
     // 把当前选中的 dt (deliveryType) 传给确认订单页
@@ -140,10 +135,15 @@ Page({
           wx.cloud.callFunction({
             name: 'deleteBook',
             data: { bookId: this.bookId },
-            success: () => {
+            success: res => {
               wx.hideLoading()
-              wx.showToast({ title: '已成功下架' })
-              setTimeout(() => wx.navigateBack(), 1500)
+              // 必须校验业务结果：云函数返回 success:false 时（状态已变/无权限）不能提示成功
+              if (res.result && res.result.success) {
+                wx.showToast({ title: '已成功下架' })
+                setTimeout(() => wx.navigateBack(), 1500)
+              } else {
+                wx.showToast({ title: (res.result && res.result.msg) || '下架失败', icon: 'none' })
+              }
             },
             fail: () => {
               wx.hideLoading()

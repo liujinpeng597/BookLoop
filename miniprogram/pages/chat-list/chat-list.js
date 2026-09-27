@@ -116,6 +116,8 @@ Page({
     }
   },
 
+  // 注意：这里故意绕过 setData 直接改 currentX——滑动跟手需要高频写入，
+  // setData 开销会造成掉帧。该字段仅作手势状态缓存，不参与渲染。
   onSlideChange(e) {
     const index = e.currentTarget.dataset.index
     this.data.conversations[index].currentX = e.detail.x

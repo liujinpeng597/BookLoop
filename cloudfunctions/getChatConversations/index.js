@@ -1,12 +1,12 @@
 const cloud = require('wx-server-sdk')
+const { isAdminOpenid } = require('./cloud-common')
+
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()
 
-const ADMIN_OPENIDS = ['oBpJc7B-M09rkIGtZNQNn2CgHDN8']
-
 exports.main = async (event) => {
   const { OPENID } = cloud.getWXContext()
-  const isAdmin = ADMIN_OPENIDS.includes(OPENID)
+  const isAdmin = isAdminOpenid(OPENID)
 
   try {
     let query = db.collection('chat_messages').aggregate()
@@ -34,6 +34,8 @@ exports.main = async (event) => {
         orderStatus: db.command.aggregate.last('$orderStatus')
       })
       .sort({ lastTime: -1 })
+      // 聚合查询存在默认返回条数上限（约 20 条），必须显式声明上限，否则会话列表会被静默截断
+      .limit(100)
       .end()
 
     const list = res.list || []
@@ -60,6 +62,7 @@ exports.main = async (event) => {
 
     return { success: true, data: list, nicknames }
   } catch (e) {
+    console.error('getChatConversations error:', e)
     return { success: false, msg: '加载失败' }
   }
 }

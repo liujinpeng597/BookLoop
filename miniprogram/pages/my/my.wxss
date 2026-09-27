@@ -181,6 +181,14 @@ page {
   padding-bottom: 60rpx;
 }
 
+/* 列表底部加载提示 */
+.load-more {
+  text-align: center;
+  color: #94a3b8;
+  font-size: 24rpx;
+  padding: 16rpx 0 40rpx;
+}
+
 .order-card { 
   background: #fff; 
   border-radius: 20rpx; 

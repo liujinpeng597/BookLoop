@@ -5,7 +5,10 @@ Page({
     navTop: 0,
     navHeight: 0,
     loading: false,
+    loadingMore: false,
     books: [],
+    page: 1,
+    hasMore: false,
     statusFilter: 'on_sale',
     tabs: [
       { label: '在售中', value: 'on_sale' },
@@ -18,33 +21,58 @@ Page({
     this.setData(getNavBarInfo())
   },
 
-  onShow() { 
-    this.loadAdminBooks() 
+  onShow() {
+    this.loadAdminBooks()
   },
 
-  loadAdminBooks() {
-    this.setData({ loading: true })
+  // 书籍列表：服务端分页（每页 100 条以内），append=true 时加载下一页
+  loadAdminBooks(append = false) {
+    const page = append ? this.data.page + 1 : 1
+    if (append) this.setData({ loadingMore: true })
+    else this.setData({ loading: true })
+
     wx.cloud.callFunction({
       name: 'getBooks',
       data: {
         statusFilter: this.data.statusFilter,
+        page,
         pageSize: 100
       },
       success: res => {
-        this.setData({ books: res.result.data || [], loading: false })
+        if (res.result && res.result.success) {
+          const books = res.result.data || []
+          this.setData({
+            books: append ? this.data.books.concat(books) : books,
+            page,
+            hasMore: !!res.result.hasMore,
+            loading: false,
+            loadingMore: false
+          })
+        } else {
+          this.setData({ loading: false, loadingMore: false })
+          wx.showToast({ title: (res.result && res.result.msg) || '加载失败', icon: 'none' })
+        }
       },
       fail: () => {
+        this.setData({ loading: false, loadingMore: false })
         wx.showToast({ title: '加载失败', icon: 'none' })
-        this.setData({ loading: false })
       },
       complete: () => wx.stopPullDownRefresh()
     })
   },
 
+  // 触底加载更多
+  onReachBottom() {
+    if (this.data.loading || this.data.loadingMore) return
+    if (this.data.hasMore) {
+      this.loadAdminBooks(true)
+    }
+  },
+
   onTabChange(e) {
     const value = e.currentTarget.dataset.value
     if (this.data.statusFilter === value) return
-    
+
     this.setData({ statusFilter: value })
     this.loadAdminBooks()
   },
@@ -64,9 +92,14 @@ Page({
           wx.cloud.callFunction({
             name: 'editBook',
             data: { bookId: id, status: status },
-            success: () => {
+            success: r => {
               wx.hideLoading()
-              wx.showToast({ title: '操作成功' })
+              // 必须校验业务结果：书籍状态已改变时 r.result.success 为 false
+              if (r.result && r.result.success) {
+                wx.showToast({ title: '操作成功', icon: 'success' })
+              } else {
+                wx.showToast({ title: (r.result && r.result.msg) || '操作失败', icon: 'none' })
+              }
               this.loadAdminBooks() // 重新刷新列表
             },
             fail: () => {
@@ -91,9 +124,13 @@ Page({
           wx.cloud.callFunction({
             name: 'deleteBook',
             data: { bookId, permanent: true },
-            success: () => {
+            success: r => {
               wx.hideLoading()
-              wx.showToast({ title: '已删除', icon: 'success' })
+              if (r.result && r.result.success) {
+                wx.showToast({ title: '已删除', icon: 'success' })
+              } else {
+                wx.showToast({ title: (r.result && r.result.msg) || '删除失败', icon: 'none' })
+              }
               this.loadAdminBooks()
             },
             fail: () => {

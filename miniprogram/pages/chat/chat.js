@@ -1,5 +1,6 @@
 const app = getApp()
 const { getNavBarInfo } = require('../../utils/util')
+const { STATUS_MAP } = require('../../utils/constants')
 
 const EMOJI_LIST = [
   '😀','😂','🤣','😊','😍','🤔','😎','😢','😡','😱','🤗','🤩','😴','🥰','😋','🤐','🙄','😏','😌','😭',
@@ -35,12 +36,7 @@ Page({
     showEmojiPanel: false,
     emojiList: EMOJI_LIST,
 
-    statusMap: {
-      pending: '待交接',
-      shipped: '配送中',
-      completed: '已完成',
-      cancelled: '已取消'
-    }
+    statusMap: STATUS_MAP
   },
 
   onLoad(options) {
@@ -251,9 +247,10 @@ Page({
     this.setData({ showOrderPicker: true, showEmojiPanel: false })
     wx.showLoading({ title: '加载订单...' })
 
+    // 注：订单归属由服务端根据 OPENID 判定，无需（也不应）传 isAdmin
     wx.cloud.callFunction({
       name: 'getOrders',
-      data: { isAdmin: false },
+      data: { page: 1, pageSize: 20 },
       success: res => {
         wx.hideLoading()
         const orders = ((res.result && res.result.data) || []).map(o => ({
@@ -346,11 +343,11 @@ Page({
     })
   },
 
-  // 清除当前会话的聊天记录
+  // 清除当前会话的聊天记录（服务端物理删除，双方都会失去这些记录）
   onClearChat() {
     wx.showModal({
       title: '清除聊天记录',
-      content: '确定要清除当前会话的所有聊天记录吗？此操作不可恢复。',
+      content: '将同时清除你与对方（管理员/买家）双方的全部聊天记录，此操作不可恢复。',
       confirmColor: '#ef4444',
       success: res => {
         if (res.confirm) {

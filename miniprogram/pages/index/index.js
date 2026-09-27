@@ -60,7 +60,8 @@ Page({
           const newBooks = res.result.data || []
           
           newBooks.forEach(book => {
-            book.condClass = condToClass(book.condition, 'cond-bachenxin')
+            // 未知成色用中性灰样式，不冒充任何具体成色
+            book.condClass = condToClass(book.condition, 'cond-other')
           })
 
           this.setData({
