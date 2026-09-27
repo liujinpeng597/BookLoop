@@ -1,0 +1,83 @@
+<view class="container">
+  <view class="custom-nav" style="padding-top: {{navTop}}px; height: {{navHeight}}px; box-sizing: content-box;">
+    <view class="nav-back" style="height: {{navHeight}}px;" bindtap="onBackTap">
+      <text class="back-icon">◁</text>
+    </view>
+    <view class="nav-title" style="height: {{navHeight}}px; line-height: {{navHeight}}px;">订单处理后台</view>
+  </view>
+  
+  <view style="height: {{navTop + navHeight}}px; background-color: #f1f5f9;"></view>
+
+  <scroll-view class="filter-bar" scroll-x>
+    <view 
+      wx:for="{{statusList}}" 
+      wx:key="value" 
+      class="filter-btn {{statusFilter === item.value ? 'filter-active' : ''}}" 
+      data-value="{{item.value}}" 
+      bindtap="onFilterChange"
+    >
+      {{item.label}}
+    </view>
+  </scroll-view>
+
+  <view class="loading" wx:if="{{loading}}">加载中...</view>
+  <view class="empty" wx:elif="{{orders.length === 0}}">
+    <text class="empty-icon">📭</text>
+    <text class="empty-text">暂无对应订单</text>
+  </view>
+  
+  <view wx:else class="order-list">
+    <view class="order-card" wx:for="{{orders}}" wx:key="_id" bindtap="onOrderTap" data-id="{{item._id}}">
+      
+      <view class="order-header">
+        <text class="order-no">单号: {{item.orderNo}}</text>
+        <text class="order-status status-{{item.status}}">{{statusMap[item.status]}}</text>
+        <text class="pay-tag {{item.paid ? 'paid' : 'unpaid'}}">{{item.paid ? '已付' : '待付'}}</text>
+      </view>
+
+      <!-- 多书订单 -->
+      <block wx:if="{{item.isBatch}}">
+        <view class="batch-books">
+          <view class="batch-book-item" wx:for="{{item.items}}" wx:key="bookId" wx:for-item="bk">
+            <image wx:if="{{bk.coverUrl}}" src="{{bk.coverUrl}}" mode="aspectFill" class="book-thumb-sm"/>
+            <view wx:else class="book-thumb-ph-sm">📖</view>
+            <view class="book-info-sm">
+              <text class="book-title-sm">{{bk.title}}</text>
+              <text class="book-price-sm">¥{{bk.price}}</text>
+            </view>
+          </view>
+        </view>
+        <view class="batch-total">
+          <text>共{{item.items.length}}本 · 总价 ¥{{item.totalPrice}}</text>
+          <text wx:if="{{item.deliveryFee > 0}}" class="fee-tag">含配送费 ¥{{item.deliveryFee}}</text>
+        </view>
+      </block>
+
+      <!-- 单书订单 -->
+      <view class="order-book" wx:else>
+        <image wx:if="{{item.bookCover}}" src="{{item.bookCover}}" mode="aspectFill" class="book-thumb"/>
+        <view wx:else class="book-thumb-ph">📖</view>
+        <view class="book-info">
+          <text class="book-title">{{item.bookTitle}}</text>
+          <text class="book-price">¥{{item.price}}</text>
+        </view>
+      </view>
+      
+      <view class="buyer-info">
+        <text class="buyer-row">买家：{{item.buyerName}} · {{item.buyerPhone}}</text>
+        <text class="buyer-row type-{{item.deliveryType}}">方式：{{item.deliveryType === 'delivery' ? '🚚 送货上门' : '🏃 校园自提'}}</text>
+        <text wx:if="{{item.address}}" class="buyer-row type-{{item.deliveryType}}">地址：{{item.address}}</text>
+      </view>
+      
+      <view class="action-row">
+        <view wx:if="{{item.status === 'pending'}}" class="action-btn btn-cancel" data-order-id="{{item._id}}" data-new-status="cancelled" data-label="已取消" catchtap="onUpdateStatus">取消订单</view>
+        <view wx:if="{{item.status === 'pending'}}" class="action-btn btn-ship" data-order-id="{{item._id}}" data-new-status="shipped" data-label="已发货" catchtap="onUpdateStatus">发货 / 去交接</view>
+        
+        <view wx:if="{{item.status === 'shipped'}}" class="action-btn btn-complete" data-order-id="{{item._id}}" data-new-status="completed" data-label="已完成" catchtap="onUpdateStatus">确认交易完成</view>
+
+        <view wx:if="{{item.status === 'completed' || item.status === 'cancelled'}}" class="action-btn btn-delete" data-id="{{item._id}}" catchtap="onDeleteOrder">清理订单</view>
+      </view>
+      
+    </view>
+  </view>
+</view>

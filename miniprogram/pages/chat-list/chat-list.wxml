@@ -1,0 +1,53 @@
+<view class="container">
+  <view class="custom-nav" style="padding-top: {{navTop}}px; height: {{navHeight}}px; box-sizing: content-box;">
+    <view class="nav-title" style="height: {{navHeight}}px; line-height: {{navHeight}}px;">理工布克</view>
+  </view>
+
+  <view style="height: {{navTop + navHeight}}px; background-color: #f1f5f9;"></view>
+
+  <view class="header">
+    <view class="header-left">
+      <text class="app-name">💬 消息与通知中心</text>
+      <text class="app-sub">查收你的最新交易与提醒</text>
+    </view>
+  </view>
+
+  <view class="msg-list">
+    <block wx:for="{{conversations}}" wx:key="id">
+      <movable-area class="swipe-area">
+        <movable-view
+          class="swipe-view"
+          direction="horizontal"
+          x="{{item.x}}"
+          data-index="{{index}}"
+          bindchange="onSlideChange"
+          bindtouchend="onSlideEnd"
+          animation="true"
+        >
+          <view class="swipe-content">
+            <view class="msg-item" bindtap="onItemTap" data-id="{{item.id}}" data-type="{{item.msgType}}">
+              <view class="avatar-box type-{{item.msgType}}">
+                <text class="avatar-icon">{{item.icon}}</text>
+              </view>
+              <view class="msg-content">
+                <view class="msg-header">
+                  <text class="msg-title">{{item.username}}</text>
+                  <text class="msg-time">{{item.time}}</text>
+                </view>
+                <text class="msg-desc">{{item.lastMsg}}</text>
+              </view>
+            </view>
+            <view class="delete-btn" catchtap="onDeleteMsg" data-id="{{item.id}}" data-type="{{item.msgType}}" data-index="{{index}}">
+              删除
+            </view>
+          </view>
+        </movable-view>
+      </movable-area>
+    </block>
+
+    <view class="empty" wx:if="{{conversations.length === 0}}">
+      <text class="empty-icon">📭</text>
+      <text class="empty-text">暂无新消息</text>
+    </view>
+  </view>
+</view>

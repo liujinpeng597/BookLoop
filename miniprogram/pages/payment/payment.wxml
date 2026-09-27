@@ -1,0 +1,96 @@
+<view class="container">
+  <view class="custom-nav" style="padding-top: {{navTop}}px; height: {{navHeight}}px; box-sizing: content-box;">
+    <view class="nav-back" style="height: {{navHeight}}px;" bindtap="onBackTap">
+      <text class="back-icon">◁</text>
+    </view>
+    <view class="nav-title" style="height: {{navHeight}}px; line-height: {{navHeight}}px;">确认支付</view>
+  </view>
+  <view style="height: {{navTop + navHeight}}px; background-color: #f1f5f9;"></view>
+
+  <!-- 加载中 -->
+  <view class="loading" wx:if="{{loading}}">加载中...</view>
+
+  <!-- 支付成功 -->
+  <block wx:elif="{{payDone}}">
+    <view class="success-card">
+      <view class="success-icon-wrap">
+        <text class="success-icon">✓</text>
+      </view>
+      <text class="success-title">支付成功</text>
+      <text class="success-amount">¥{{totalAmount}}</text>
+      <text class="success-hint">卖家将尽快处理您的订单</text>
+      <view class="success-btn" bindtap="onViewOrder">查看订单详情</view>
+    </view>
+  </block>
+
+  <!-- 支付主界面 -->
+  <block wx:elif="{{order}}">
+    <!-- 订单摘要 -->
+    <view class="card">
+      <text class="card-title">订单信息</text>
+
+      <block wx:if="{{order.isBatch}}">
+        <view class="book-item" wx:for="{{order.items}}" wx:key="bookId" wx:for-item="bk">
+          <image wx:if="{{bk.coverUrl}}" src="{{bk.coverUrl}}" mode="aspectFill" class="book-thumb"/>
+          <view wx:else class="book-thumb-ph">📖</view>
+          <view class="book-meta">
+            <text class="book-name">{{bk.title}}</text>
+            <text class="book-price">¥{{bk.price}}</text>
+          </view>
+        </view>
+      </block>
+
+      <block wx:else>
+        <view class="book-item">
+          <image wx:if="{{order.bookCover}}" src="{{order.bookCover}}" mode="aspectFill" class="book-thumb"/>
+          <view wx:else class="book-thumb-ph">📖</view>
+          <view class="book-meta">
+            <text class="book-name">{{order.bookTitle}}</text>
+            <text class="book-price">¥{{order.price}}</text>
+          </view>
+        </view>
+      </block>
+
+      <view class="divider"></view>
+
+      <view class="amount-row" wx:if="{{order.isBatch}}">
+        <text>商品总价 ({{order.items.length}}本)</text>
+        <text>¥{{order.totalPrice}}</text>
+      </view>
+      <view class="amount-row" wx:if="{{order.deliveryFee > 0}}">
+        <text>配送费</text>
+        <text>¥{{order.deliveryFee}}</text>
+      </view>
+      <view class="amount-row total">
+        <text>应付金额</text>
+        <text class="total-num">¥{{totalAmount}}</text>
+      </view>
+    </view>
+
+    <!-- 收款二维码 -->
+    <view class="card qrcode-card">
+      <text class="card-title">扫码支付</text>
+      <view class="qrcode-wrap">
+        <image class="qrcode-img" src="{{qrcodeUrl}}" mode="aspectFit" wx:if="{{qrcodeUrl}}" />
+        <text class="qrcode-placeholder" wx:elif="{{qrcodeLoading}}">二维码加载中...</text>
+        <text class="qrcode-placeholder" wx:else>收款码暂未配置，请联系管理员</text>
+      </view>
+      <view class="qrcode-tips">
+        <text class="qrcode-tip">1. 请使用微信扫一扫上方二维码</text>
+        <text class="qrcode-tip">2. 付款金额：<text class="tip-highlight">¥{{totalAmount}}</text></text>
+        <text class="qrcode-tip">3. 付款完成后，点击下方按钮通知卖家</text>
+      </view>
+    </view>
+
+    <!-- 底部确认栏 -->
+    <view class="bottom-bar">
+      <view class="total-wrap">
+        <text class="total-label">需支付</text>
+        <text class="total-price">¥{{totalAmount}}</text>
+      </view>
+      <view class="pay-btn {{paying ? 'btn-disabled' : ''}}" bindtap="onPay">
+        {{paying ? '提交中...' : '我已完成支付'}}
+      </view>
+    </view>
+  </block>
+</view>

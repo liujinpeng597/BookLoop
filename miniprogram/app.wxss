@@ -1,0 +1,26 @@
+page {
+  /* 采用原生级丝滑的字体栈 */
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Segoe UI, Arial, Roboto, 'PingFang SC', 'miui', 'Hiragino Sans GB', 'Microsoft Yahei', sans-serif;
+  
+  /* 强制所有元素使用 border-box 盒模型，彻底杜绝 padding 把容器撑破的 Bug */
+  box-sizing: border-box;
+  
+  /* 全局背景色底色 */
+  background-color: #f1f5f9;
+}
+
+/* 统一取消默认边距 */
+view, text, scroll-view, swiper, button, form, input, textarea, label, navigator, image {
+  box-sizing: border-box;
+}
+
+/* 去除 button 的默认边框 */
+button::after {
+  border: none;
+}
+
+.btn-delete {
+  background: #f1f5f9;
+  color: #64748b;
+  border: 1rpx solid #cbd5e1;
+}

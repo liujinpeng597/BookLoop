@@ -1,0 +1,59 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/detail/detail",
+    "pages/order/order",
+    "pages/cart/cart",
+    "pages/chat-list/chat-list",
+    "pages/my/my",
+    "pages/chat/chat",
+    "pages/admin-book-edit/admin-book-edit",
+    "pages/admin-orders/admin-orders",
+    "pages/admin-books/admin-books",
+    "pages/order-detail/order-detail",
+    "pages/payment/payment",
+    "pages/admin-announcement/admin-announcement",
+    "pages/admin-settings/admin-settings"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTextStyle": "black",
+    "navigationStyle": "custom",
+    "backgroundColor": "#f1f5f9"
+  },
+  "tabBar": {
+    "color": "#94a3b8",
+    "selectedColor": "#f97316",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "assets/tab-home.png",
+        "selectedIconPath": "assets/tab-home-active.png"
+      },
+      {
+        "pagePath": "pages/cart/cart",
+        "text": "购物车",
+        "iconPath": "assets/tab-cart.png",
+        "selectedIconPath": "assets/tab-cart-active.png"
+      },
+      {
+        "pagePath": "pages/chat-list/chat-list",
+        "text": "消息",
+        "iconPath": "assets/tab-chat.png",
+        "selectedIconPath": "assets/tab-chat-active.png"
+      },
+      {
+        "pagePath": "pages/my/my",
+        "text": "我的",
+        "iconPath": "assets/tab-my.png",
+        "selectedIconPath": "assets/tab-my-active.png"
+      }
+    ]
+  },
+  "style": "v2",
+  "lazyCodeLoading": "requiredComponents",
+  "sitemapLocation": "sitemap.json"
+}

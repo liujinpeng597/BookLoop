@@ -1,0 +1,78 @@
+<view class="container">
+  <view class="custom-nav" style="padding-top: {{navTop}}px; height: {{navHeight}}px; box-sizing: content-box;">
+    <view class="nav-title" style="height: {{navHeight}}px; line-height: {{navHeight}}px;">购物车</view>
+  </view>
+  <view style="height: {{navTop + navHeight}}px; background-color: #f1f5f9;"></view>
+
+  <view class="loading" wx:if="{{loading}}">加载中...</view>
+
+  <view class="empty" wx:elif="{{isAdmin}}">
+    <text class="empty-icon">⚫</text>
+    <text class="empty-text">管理员无需购物车功能</text>
+  </view>
+
+  <view class="empty" wx:elif="{{items.length === 0}}">
+    <text class="empty-icon">🛒</text>
+    <text class="empty-text">购物车空空的，去挑几本书吧</text>
+  </view>
+
+  <block wx:else>
+    <scroll-view class="cart-list" scroll-y enhanced show-scrollbar="{{false}}">
+      <view class="cart-item" wx:for="{{items}}" wx:key="_id">
+        <view class="check-box" data-index="{{index}}" bindtap="onCheckItem">
+          <view class="check-circle {{item.checked ? 'checked' : ''}}">
+            <text wx:if="{{item.checked}}">✓</text>
+          </view>
+        </view>
+
+        <image wx:if="{{item.coverUrl}}" src="{{item.coverUrl}}" mode="aspectFill" class="item-thumb"/>
+        <view wx:else class="item-thumb-ph">📖</view>
+
+        <view class="item-info">
+          <text class="item-title">{{item.title}}</text>
+          <text class="item-meta">{{item.condition || ''}}</text>
+          <text class="item-price">¥{{item.price}}</text>
+        </view>
+
+        <view class="delete-btn" data-index="{{index}}" bindtap="onDeleteItem">
+          <text class="delete-icon">✕</text>
+        </view>
+      </view>
+
+      <!-- 配送方式选择 -->
+      <view class="delivery-card">
+        <text class="delivery-title">配送方式</text>
+        <radio-group class="radio-group" bindchange="onDeliveryTypeChange">
+          <label class="radio-label">
+            <radio value="pickup" checked="{{deliveryType === 'pickup'}}" color="#f97316"/>
+            📍 校园自提 (卖家指定地点)
+          </label>
+          <label class="radio-label">
+            <radio value="delivery" checked="{{deliveryType === 'delivery'}}" color="#f97316"/>
+            🚚 送货上门 (需填宿舍地址)
+          </label>
+        </radio-group>
+      </view>
+
+      <view style="height: 160rpx;"></view>
+    </scroll-view>
+
+    <view class="bottom-bar">
+      <view class="check-all" bindtap="onCheckAll">
+        <view class="check-circle {{allChecked ? 'checked' : ''}}">
+          <text wx:if="{{allChecked}}">✓</text>
+        </view>
+        <text class="check-all-text">全选</text>
+      </view>
+
+      <view class="total-section">
+        <text class="total-label">合计：</text>
+        <text class="total-price">¥{{totalPrice}}</text>
+      </view>
+
+      <view class="checkout-btn {{selectedCount === 0 ? 'disabled' : ''}}" bindtap="onCheckout">
+        结算({{selectedCount}})
+      </view>
+    </view>
+  </block>
+</view>

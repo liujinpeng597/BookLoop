@@ -1,0 +1,39 @@
+<view class="container">
+  <view class="custom-nav" style="padding-top: {{navTop}}px; height: {{navHeight}}px; box-sizing: content-box;">
+    <view class="nav-back" style="height: {{navHeight}}px;" bindtap="onBackTap">
+      <text class="back-icon">◁</text>
+    </view>
+    <view class="nav-title" style="height: {{navHeight}}px; line-height: {{navHeight}}px;">收款码设置</view>
+  </view>
+  <view style="height: {{navTop + navHeight}}px; background-color: #f1f5f9;"></view>
+
+  <view class="loading" wx:if="{{loading}}">加载中...</view>
+
+  <block wx:else>
+    <view class="card">
+      <text class="card-title">当前收款码</text>
+
+      <view class="qrcode-wrap">
+        <image wx:if="{{qrcodeUrl}}" class="qrcode-img" src="{{qrcodeUrl}}" mode="aspectFit" />
+        <text wx:else class="qrcode-placeholder">尚未设置收款码</text>
+      </view>
+
+      <view class="hint">
+        <text wx:if="{{hasQrcode}}">点击下方按钮更换新的收款二维码</text>
+        <text wx:else>请上传您的微信收款二维码</text>
+      </view>
+    </view>
+
+    <view class="card">
+      <text class="card-title">操作</text>
+      <view class="btn-row">
+        <view class="btn btn-upload" bindtap="onUploadQrcode">
+          {{hasQrcode ? '更换二维码' : '上传收款码'}}
+        </view>
+        <view class="btn btn-save {{saving || !qrcodeFileId ? 'btn-disabled' : ''}}" bindtap="onSave" wx:if="{{qrcodeFileId}}">
+          {{saving ? '保存中...' : '保存设置'}}
+        </view>
+      </view>
+    </view>
+  </block>
+</view>

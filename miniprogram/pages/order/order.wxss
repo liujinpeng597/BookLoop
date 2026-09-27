@@ -1,0 +1,234 @@
+page {
+  background-color: #f1f5f9;
+}
+
+.container { 
+  background: #f1f5f9; 
+  min-height: 100vh; 
+}
+
+/* ================ 导航栏 ================ */
+.custom-nav { 
+  position: fixed; 
+  top: 0; 
+  left: 0; 
+  width: 100%; 
+  background: #ffffff; 
+  z-index: 999; 
+  display: flex; 
+  align-items: center; 
+  box-sizing: content-box; 
+}
+.nav-back { 
+  position: absolute; 
+  left: 0; 
+  padding: 0 32rpx; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  z-index: 1000; 
+}
+.back-icon { 
+  font-size: 36rpx; 
+  color: #1e293b; 
+  font-weight: bold; 
+}
+.nav-title { 
+  width: 100%; 
+  text-align: center; 
+  font-size: 34rpx; 
+  font-weight: bold; 
+  color: #1e293b; 
+}
+
+/* 多本书区域 */
+.multi-books {
+  padding: 0;
+}
+.section-label {
+  font-size: 26rpx;
+  color: #64748b;
+  font-weight: bold;
+  padding: 24rpx 32rpx 12rpx;
+}
+
+/* ================ 商品快照卡片 ================ */
+.book-preview {
+  background: #ffffff;
+  margin: 0 24rpx 16rpx;
+  border-radius: 24rpx;
+  padding: 32rpx;
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.02);
+}
+.multi-books .book-preview {
+  margin: 0 24rpx 12rpx;
+}
+.book-thumb { 
+  width: 120rpx; 
+  height: 160rpx; 
+  border-radius: 12rpx; 
+  flex-shrink: 0; 
+}
+.book-thumb-ph { 
+  width: 120rpx; 
+  height: 160rpx; 
+  background: #f1f5f9; 
+  border-radius: 12rpx; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  font-size: 60rpx; 
+  flex-shrink: 0; 
+}
+.book-meta { 
+  flex: 1; 
+  min-width: 0; 
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.book-name { 
+  font-size: 32rpx; 
+  font-weight: 800; 
+  color: #1e293b; 
+  display: block; 
+  overflow: hidden; 
+  text-overflow: ellipsis; 
+  white-space: nowrap; 
+}
+.book-auth { 
+  font-size: 24rpx; 
+  color: #94a3b8; 
+  display: block; 
+  margin-top: 8rpx; 
+}
+.book-price { 
+  font-size: 40rpx; 
+  font-weight: 900; 
+  color: #ea580c; 
+  display: block; 
+  margin-top: 16rpx; 
+}
+
+/* ================ 表单填写区域 ================ */
+.form-card { 
+  background: #ffffff; 
+  margin: 24rpx 24rpx 0; 
+  border-radius: 24rpx; 
+  padding: 32rpx; 
+  box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.02); 
+}
+.section-title { 
+  font-size: 30rpx; 
+  font-weight: 800; 
+  color: #1e293b; 
+  display: block; 
+  margin-bottom: 32rpx; 
+}
+.form-item { 
+  margin-bottom: 32rpx; 
+}
+.form-item:last-child { 
+  margin-bottom: 0; 
+}
+.label { 
+  font-size: 26rpx; 
+  color: #64748b; 
+  display: block; 
+  margin-bottom: 16rpx; 
+  font-weight: 600; 
+}
+
+.input { 
+  width: 100%; 
+  background: #f8fafc; 
+  border-radius: 16rpx; 
+  font-size: 28rpx; 
+  color: #1e293b; 
+  padding: 0 24rpx !important; 
+  height: 90rpx !important; 
+  line-height: 90rpx !important; 
+  min-height: 90rpx !important; 
+  box-sizing: border-box; 
+}
+.textarea { 
+  width: 100%; 
+  background: #f8fafc; 
+  border-radius: 16rpx; 
+  font-size: 28rpx; 
+  color: #1e293b; 
+  padding: 24rpx !important; 
+  height: 180rpx; 
+  line-height: 1.6; 
+  box-sizing: border-box; 
+}
+
+/* 🌟 自提地点的展示面板 */
+.pickup-display { 
+  width: 100%; 
+  background: #ffedd5; 
+  color: #ea580c; 
+  border-radius: 16rpx; 
+  padding: 24rpx; 
+  font-size: 28rpx; 
+  font-weight: bold; 
+  box-sizing: border-box; 
+}
+
+/* ================ 底部操作悬浮栏 ================ */
+.bottom-bar { 
+  position: fixed; 
+  bottom: 0; 
+  left: 0; 
+  right: 0; 
+  background: #ffffff; 
+  padding: 24rpx 32rpx; 
+  padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
+  display: flex; 
+  align-items: center; 
+  gap: 20rpx; 
+  box-shadow: 0 -4rpx 24rpx rgba(0, 0, 0, 0.04);
+  z-index: 100; 
+}
+.total { 
+  flex: 1; 
+  font-size: 28rpx; 
+  color: #64748b; 
+  font-weight: bold;
+}
+.total-price { 
+  font-size: 48rpx; 
+  font-weight: 900; 
+  color: #f97316; 
+}
+.submit-btn { 
+  background: linear-gradient(135deg, #f97316, #fb923c); 
+  color: #ffffff; 
+  padding: 24rpx 64rpx; 
+  border-radius: 44rpx; 
+  font-size: 32rpx; 
+  font-weight: 800; 
+  text-align: center; 
+  box-shadow: 0 8rpx 20rpx rgba(249, 115, 22, 0.25);
+}
+.btn-disabled {
+  background: #cbd5e1 !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+.fee-line {
+  font-size: 22rpx;
+  color: #94a3b8;
+  margin-bottom: 4rpx;
+}
+
+.delivery-note {
+  display: block;
+  font-size: 22rpx;
+  color: #f97316;
+  margin-top: 12rpx;
+}

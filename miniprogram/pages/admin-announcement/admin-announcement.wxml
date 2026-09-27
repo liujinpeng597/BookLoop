@@ -1,0 +1,33 @@
+<view class="container">
+  <view class="custom-nav" style="padding-top: {{navTop}}px; height: {{navHeight}}px; box-sizing: content-box;">
+    <view class="nav-back" style="height: {{navHeight}}px;" bindtap="onBackTap">
+      <text class="back-icon">◁</text>
+    </view>
+    <view class="nav-title" style="height: {{navHeight}}px; line-height: {{navHeight}}px;">发布公告</view>
+  </view>
+  <view style="height: {{navTop + navHeight}}px; background-color: #f1f5f9;"></view>
+
+  <view class="form-card">
+    <text class="form-title">编辑新公告</text>
+    <textarea class="textarea" placeholder="输入公告内容，将推送到所有用户首页..." value="{{content}}" bindinput="onInput" maxlength="500"/>
+    <text class="char-count">{{content.length}}/500</text>
+    <view class="submit-btn {{submitting ? 'btn-disabled' : ''}}" bindtap="onSubmit">
+      {{submitting ? '发布中...' : '立即发布'}}
+    </view>
+  </view>
+
+  <view class="history-section">
+    <text class="history-title">历史公告（最新 5 条）</text>
+    <view class="loading" wx:if="{{loading}}">加载中...</view>
+    <view class="empty" wx:elif="{{announcements.length === 0}}">暂无公告</view>
+    <view class="announce-list" wx:else>
+      <view class="announce-item" wx:for="{{announcements}}" wx:key="_id">
+        <view class="announce-body">
+          <text class="announce-text">{{item.content}}</text>
+          <text class="announce-time">{{item.timeStr}}</text>
+        </view>
+        <view class="btn-delete" data-id="{{item._id}}" catchtap="onDelete">删除</view>
+      </view>
+    </view>
+  </view>
+</view>

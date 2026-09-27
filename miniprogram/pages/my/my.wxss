@@ -1,0 +1,361 @@
+page {
+  background-color: #f8fafc;
+}
+
+/* ================ 导航栏 ================ */
+.custom-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 999;
+  background: linear-gradient(to bottom, #f97316, #fa8c35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: content-box; 
+}
+.nav-title {
+  color: #ffffff;
+  font-size: 34rpx;
+  font-weight: bold;
+  text-align: center;
+  width: 100%;
+}
+
+/* ================ 头部资料卡片 ================ */
+.profile-header {
+  background: linear-gradient(to bottom, #fa8c35, #f97316);
+  padding: 60rpx 40rpx 80rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #ffffff;
+  border-bottom-left-radius: 40rpx;
+  border-bottom-right-radius: 40rpx;
+  position: relative;
+  box-shadow: 0 10rpx 30rpx rgba(249, 115, 22, 0.2);
+}
+
+.avatar-wrap {
+  position: relative;
+  margin-bottom: 24rpx;
+}
+
+.avatar {
+  width: 160rpx;
+  height: 160rpx;
+  background-color: #ffffff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 80rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.1);
+  border: 6rpx solid rgba(255, 255, 255, 0.8);
+}
+
+/* 头像选择按钮 — 复用 avatar 的尺寸，去掉 button 默认样式 */
+.avatar-btn {
+  width: 160rpx;
+  height: 160rpx;
+  min-width: 160rpx;
+  max-width: 160rpx;
+  min-height: 160rpx;
+  max-height: 160rpx;
+  background-color: #ffffff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 80rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.1);
+  border: 6rpx solid rgba(255, 255, 255, 0.8);
+  padding: 0;
+  margin: 0;
+  line-height: 1;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+.avatar-btn::after { display: none; }
+
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: block;
+}
+
+.avatar-placeholder {
+  font-size: 80rpx;
+  line-height: 1;
+}
+
+/* 管理员专属黑白极简风格头像 */
+.admin-avatar {
+  background-color: #1e293b;
+  border-color: #0f172a;
+}
+
+.nickname-row {
+  margin-bottom: 8rpx;
+}
+.nickname-input {
+  font-size: 38rpx;
+  font-weight: 900;
+  color: #ffffff;
+  text-align: center;
+  text-shadow: 0 2rpx 4rpx rgba(0,0,0,0.1);
+  height: 60rpx;
+  line-height: 60rpx;
+  max-width: 400rpx;
+}
+
+.profile-tip {
+  font-size: 22rpx;
+  color: rgba(255, 255, 255, 0.55);
+  margin-top: 12rpx;
+}
+
+.nickname {
+  font-size: 38rpx;
+  font-weight: 900;
+  text-shadow: 0 2rpx 4rpx rgba(0,0,0,0.1);
+}
+
+.admin-tag {
+  background-color: #ffffff;
+  color: #ea580c;
+  font-size: 22rpx;
+  font-weight: 800;
+  padding: 6rpx 20rpx;
+  border-radius: 24rpx;
+  margin-top: 16rpx;
+  box-shadow: 0 4rpx 8rpx rgba(0,0,0,0.1);
+}
+
+/* ================ 模块标题 ================ */
+.section-title {
+  padding: 0 40rpx;
+  font-size: 34rpx;
+  font-weight: 900;
+  color: #1e293b;
+  margin-bottom: 30rpx;
+  margin-top: 50rpx;
+}
+
+/* ================ 管理员面板 (Grid) ================ */
+.admin-grid {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0 40rpx;
+  gap: 20rpx;
+}
+.admin-card {
+  width: calc(50% - 10rpx);
+  background-color: #ffffff;
+  border-radius: 20rpx;
+  padding: 40rpx 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+}
+.admin-card:active {
+  transform: scale(0.95);
+  background-color: #f1f5f9;
+}
+.admin-icon {
+  font-size: 64rpx;
+  margin-bottom: 16rpx;
+}
+.admin-card text {
+  font-size: 26rpx;
+  color: #334155;
+  font-weight: bold;
+}
+
+/* ================ 订单列表区 ================ */
+.order-list {
+  padding-bottom: 60rpx;
+}
+
+.order-card { 
+  background: #fff; 
+  border-radius: 20rpx; 
+  margin: 0 40rpx 30rpx; 
+  padding: 30rpx; 
+  box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.03); 
+}
+
+.order-header { 
+  display: flex; 
+  justify-content: space-between; 
+  margin-bottom: 24rpx; 
+  font-size: 26rpx; 
+  padding-bottom: 16rpx;
+  border-bottom: 1rpx dashed #f1f5f9;
+}
+.order-no { color: #94a3b8; }
+.order-status { font-weight: 800; }
+.status-pending { color: #f97316; }
+.status-shipped { color: #3b82f6; }
+.status-completed { color: #10b981; }
+.status-cancelled { color: #94a3b8; }
+
+.pay-tag {
+  font-size: 22rpx;
+  padding: 4rpx 16rpx;
+  border-radius: 20rpx;
+  margin-left: 12rpx;
+  font-weight: 600;
+}
+.pay-tag.paid {
+  background: #d1fae5;
+  color: #059669;
+}
+.pay-tag.unpaid {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.order-row { 
+  display: flex; 
+  align-items: center; 
+}
+.book-thumb, .book-thumb-ph { 
+  width: 100rpx; 
+  height: 130rpx; 
+  border-radius: 12rpx; 
+  background: #f1f5f9; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  font-size: 40rpx; 
+  flex-shrink: 0; 
+}
+.book-info { 
+  margin-left: 24rpx; 
+  display: flex; 
+  flex-direction: column; 
+}
+.book-title { 
+  font-size: 30rpx; 
+  font-weight: 800; 
+  color: #1e293b; 
+  margin-bottom: 12rpx; 
+}
+.book-price { 
+  font-size: 36rpx; 
+  color: #ea580c; 
+  font-weight: 900; 
+}
+
+.order-footer {
+  margin-top: 24rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx dashed #f1f5f9;
+  display: flex;
+  flex-direction: column;
+}
+.delivery-way {
+  font-size: 24rpx;
+  color: #64748b;
+  margin-bottom: 8rpx;
+  font-weight: bold;
+}
+.delivery-address {
+  font-size: 26rpx;
+  color: #ea580c;
+  font-weight: 500;
+}
+
+/* ================ 空状态与加载 ================ */
+.empty { 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  margin-top: 100rpx; 
+}
+.empty-icon { font-size: 100rpx; margin-bottom: 20rpx; opacity: 0.5; }
+.empty-text { color: #94a3b8; font-size: 28rpx; font-weight: 500;}
+.loading { text-align: center; color: #94a3b8; font-size: 28rpx; margin-top: 60rpx; }
+
+.order-action-row {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 20rpx;
+  margin-top: 20rpx;
+  border-top: 1rpx dashed #e2e8f0;
+}
+
+.btn-delete {
+  font-size: 24rpx;
+  color: #ef4444;
+  background-color: #fee2e2;
+  padding: 12rpx 32rpx;
+  border-radius: 30rpx;
+  font-weight: 500;
+}
+
+/* ================ 多书订单 ================ */
+.batch-books {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+.batch-book-item {
+  display: flex;
+  align-items: center;
+}
+.book-thumb-sm, .book-thumb-ph-sm {
+  width: 70rpx;
+  height: 90rpx;
+  border-radius: 8rpx;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30rpx;
+  flex-shrink: 0;
+}
+.book-info-sm {
+  margin-left: 16rpx;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.book-title-sm {
+  font-size: 26rpx;
+  font-weight: 700;
+  color: #1e293b;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-bottom: 4rpx;
+}
+.book-price-sm {
+  font-size: 28rpx;
+  color: #ea580c;
+  font-weight: 800;
+}
+.batch-total {
+  margin-top: 8rpx;
+  padding-top: 16rpx;
+  border-top: 1rpx dashed #f1f5f9;
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  font-size: 26rpx;
+  font-weight: 800;
+  color: #1e293b;
+}
+.fee-tag {
+  font-size: 22rpx;
+  font-weight: 500;
+  color: #64748b;
+  background: #f1f5f9;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+}

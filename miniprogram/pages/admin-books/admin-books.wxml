@@ -1,0 +1,62 @@
+<view class="container">
+  <view class="custom-nav" style="padding-top: {{navTop}}px; height: {{navHeight}}px; box-sizing: content-box;">
+    <view class="nav-back" style="height: {{navHeight}}px;" bindtap="onBackTap"><text class="back-icon">◁</text></view>
+    <view class="nav-title" style="height: {{navHeight}}px; line-height: {{navHeight}}px;">书籍管理后台</view>
+  </view>
+  <view style="height: {{navTop + navHeight}}px; background-color: #f1f5f9;"></view>
+
+  <view class="tab-bar">
+    <view 
+      wx:for="{{tabs}}" 
+      wx:key="value" 
+      class="tab-item {{statusFilter === item.value ? 'tab-active' : ''}}" 
+      data-value="{{item.value}}" 
+      bindtap="onTabChange"
+    >
+      {{item.label}}
+    </view>
+  </view>
+
+  <view class="loading" wx:if="{{loading}}">加载中...</view>
+  
+  <view class="empty" wx:elif="{{books.length === 0}}">
+    <text class="empty-icon">🗂️</text>
+    <text class="empty-text">当前分类下没有书籍</text>
+  </view>
+  
+  <view wx:else class="book-list">
+    <view class="book-card" wx:for="{{books}}" wx:key="_id">
+      
+      <view class="book-content">
+        <image wx:if="{{item.coverUrl}}" src="{{item.coverUrl}}" mode="aspectFill" class="book-thumb"/>
+        <view wx:else class="book-thumb-ph">📖</view>
+        
+        <view class="book-info">
+          <text class="book-title">{{item.title}}</text>
+          <text class="book-price">¥{{item.price}} <text class="book-orig" wx:if="{{item.originalPrice}}">¥{{item.originalPrice}}</text></text>
+          
+          <text class="book-meta">浏览: {{item.views || 0}} · 真实状态: {{item.status === 'on_sale' ? '在售中' : (item.status === 'removed' ? '已下架' : '已售出')}}</text>
+        </view>
+      </view>
+      
+      <view class="action-row">
+        <block wx:if="{{statusFilter === 'on_sale'}}">
+          <view class="btn btn-edit" data-id="{{item._id}}" bindtap="onEdit">修改信息</view>
+          <view class="btn btn-danger" data-id="{{item._id}}" data-status="removed" data-label="下架" bindtap="onChangeStatus">强制下架</view>
+        </block>
+
+        <block wx:if="{{statusFilter === 'removed'}}">
+          <view class="btn btn-edit" data-id="{{item._id}}" bindtap="onEdit">修改信息</view>
+          <view class="btn btn-success" data-id="{{item._id}}" data-status="on_sale" data-label="重新上架" bindtap="onChangeStatus">重新上架</view>
+          <view class="btn btn-delete" data-id="{{item._id}}" bindtap="onDelete">彻底删除</view>
+        </block>
+
+        <block wx:if="{{statusFilter === 'sold'}}">
+          <view class="btn btn-edit" data-id="{{item._id}}" bindtap="onEdit">查看信息</view>
+          <view class="btn btn-delete" data-id="{{item._id}}" bindtap="onDelete">彻底删除</view>
+        </block>
+      </view>
+
+    </view>
+  </view>
+</view>

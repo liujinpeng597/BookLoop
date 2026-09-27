@@ -1,0 +1,483 @@
+page {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #f1f5f9;
+  overflow: hidden;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* 导航栏 */
+.custom-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: #ffffff;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  box-sizing: content-box;
+}
+.nav-back {
+  position: absolute;
+  left: 0;
+  padding: 0 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.back-icon {
+  font-size: 36rpx;
+  color: #1e293b;
+  font-weight: bold;
+}
+.nav-clear {
+  position: absolute;
+  /* right 由内联样式根据胶囊按钮位置动态计算，避免与微信自带胶囊重叠 */
+  padding: 0 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  color: #64748b;
+  font-size: 26rpx;
+}
+.nav-title {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0 220rpx;
+  text-align: center;
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #1e293b;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 消息区域（用于定位新消息提醒气泡） */
+.msg-area {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* 消息列表 */
+.msg-list {
+  flex: 1;
+  min-height: 0;
+  padding: 24rpx;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+/* 新消息提醒气泡 */
+.new-msg-pill {
+  position: absolute;
+  bottom: 24rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #f97316;
+  color: #ffffff;
+  font-size: 26rpx;
+  font-weight: bold;
+  padding: 16rpx 32rpx;
+  border-radius: 40rpx;
+  box-shadow: 0 6rpx 20rpx rgba(249, 115, 22, 0.35);
+  display: flex;
+  align-items: center;
+  z-index: 50;
+}
+.new-msg-icon {
+  margin-right: 8rpx;
+  font-size: 30rpx;
+  line-height: 1;
+}
+
+.msg-date-sep {
+  display: flex;
+  justify-content: center;
+  padding: 40rpx 0;
+}
+.date-text {
+  font-size: 24rpx;
+  color: #94a3b8;
+}
+
+/* 单行消息 */
+.msg-row {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 32rpx;
+}
+.msg-mine {
+  flex-direction: row-reverse;
+}
+
+.avatar-box {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.avatar-emoji {
+  font-size: 38rpx;
+  line-height: 1;
+}
+
+/* 气泡 */
+.msg-bubble {
+  max-width: 65%;
+  padding: 20rpx 28rpx;
+  border-radius: 24rpx;
+  margin: 0 16rpx;
+  word-break: break-all;
+}
+.bubble-other {
+  background: #ffffff;
+  border-top-left-radius: 6rpx;
+}
+.bubble-mine {
+  background: linear-gradient(135deg, #f97316, #fb923c);
+  border-top-right-radius: 6rpx;
+}
+.bubble-text {
+  font-size: 30rpx;
+  line-height: 1.5;
+  color: #1e293b;
+}
+.bubble-mine .bubble-text {
+  color: #ffffff;
+}
+
+/* ========== 订单分享卡片 ========== */
+.order-share-wrap {
+  max-width: 75%;
+  margin: 0 16rpx;
+}
+.order-share-label {
+  font-size: 22rpx;
+  color: #94a3b8;
+  margin-bottom: 10rpx;
+  display: block;
+}
+.msg-mine .order-share-label {
+  text-align: right;
+}
+
+.order-card {
+  background: #ffffff;
+  border-radius: 16rpx;
+  padding: 20rpx 24rpx;
+  margin-bottom: 12rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+}
+.order-card:active {
+  background: #f8fafc;
+}
+.order-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8rpx;
+}
+.order-card-no {
+  font-size: 22rpx;
+  color: #94a3b8;
+}
+.order-card-status {
+  font-size: 20rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 12rpx;
+}
+.status-pending { background: #fef3c7; color: #d97706; }
+.status-shipped { background: #dbeafe; color: #2563eb; }
+.status-completed { background: #dcfce7; color: #16a34a; }
+.status-cancelled { background: #fee2e2; color: #dc2626; }
+
+.order-card-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1e293b;
+  display: block;
+  margin-bottom: 8rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.order-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.order-card-price {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #f97316;
+}
+.order-card-link {
+  font-size: 22rpx;
+  color: #3b82f6;
+}
+
+/* ========== 底部输入栏 ========== */
+.input-bar {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  padding: 16rpx 24rpx;
+  box-shadow: 0 -2rpx 12rpx rgba(0, 0, 0, 0.04);
+  z-index: 100;
+}
+
+.plus-btn {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  background: #f97316;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16rpx;
+  flex-shrink: 0;
+}
+.plus-btn text {
+  font-size: 38rpx;
+  color: #ffffff;
+  font-weight: bold;
+  line-height: 1;
+}
+.plus-btn:active {
+  background: #ea580c;
+}
+
+.msg-input {
+  flex: 1;
+  height: 72rpx;
+  background: #f1f5f9;
+  border-radius: 36rpx;
+  padding: 0 28rpx;
+  font-size: 28rpx;
+  color: #1e293b;
+}
+.send-btn {
+  padding: 0 28rpx;
+  height: 72rpx;
+  line-height: 72rpx;
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #94a3b8;
+  flex-shrink: 0;
+}
+.send-active {
+  color: #f97316;
+}
+
+/* 表情按钮 */
+.emoji-btn {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12rpx;
+  flex-shrink: 0;
+}
+.emoji-btn text {
+  font-size: 36rpx;
+  line-height: 1;
+}
+.emoji-btn:active {
+  background: #f1f5f9;
+}
+.emoji-btn-active {
+  background: #fff7ed;
+}
+
+/* 表情面板 */
+.emoji-panel {
+  width: 100%;
+  height: 440rpx;
+  background: #ffffff;
+  border-top: 1rpx solid #f1f5f9;
+  z-index: 99;
+}
+.emoji-grid {
+  height: 100%;
+  padding: 16rpx 20rpx;
+  box-sizing: border-box;
+}
+.emoji-item {
+  display: inline-flex;
+  width: 68rpx;
+  height: 68rpx;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  border-radius: 12rpx;
+  margin: 6rpx;
+}
+.emoji-item:active {
+  background: #f1f5f9;
+}
+
+/* ========== 订单选择器遮罩 ========== */
+.order-picker-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 2000;
+  display: flex;
+  align-items: flex-end;
+}
+
+.order-picker {
+  width: 100%;
+  max-height: 70vh;
+  background: #ffffff;
+  border-radius: 32rpx 32rpx 0 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.picker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 32rpx 32rpx 20rpx;
+  border-bottom: 1rpx solid #f1f5f9;
+}
+.picker-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #1e293b;
+}
+.picker-cancel {
+  font-size: 28rpx;
+  color: #94a3b8;
+}
+
+.picker-list {
+  flex: 1;
+  max-height: 50vh;
+  padding: 16rpx 0;
+}
+.picker-empty {
+  text-align: center;
+  padding: 80rpx 0;
+  color: #94a3b8;
+  font-size: 28rpx;
+}
+
+.picker-item {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 32rpx;
+  border-bottom: 1rpx solid #f8fafc;
+}
+.picker-item:active {
+  background: #f8fafc;
+}
+.picker-item-selected {
+  background: #fff7ed;
+}
+
+.picker-checkbox {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  border: 3rpx solid #cbd5e1;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.picker-checkbox.checked {
+  background: #f97316;
+  border-color: #f97316;
+}
+.picker-checkbox.checked text {
+  color: #ffffff;
+  font-size: 24rpx;
+  font-weight: bold;
+}
+
+.picker-order-info {
+  flex: 1;
+  min-width: 0;
+}
+.picker-order-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6rpx;
+}
+.picker-order-no {
+  font-size: 22rpx;
+  color: #94a3b8;
+}
+.picker-order-status {
+  font-size: 20rpx;
+  padding: 2rpx 10rpx;
+  border-radius: 10rpx;
+  background: #f1f5f9;
+  color: #64748b;
+}
+.picker-order-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1e293b;
+  display: block;
+  margin-bottom: 4rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.picker-order-price {
+  font-size: 26rpx;
+  font-weight: 700;
+  color: #f97316;
+}
+
+.picker-footer {
+  padding: 20rpx 32rpx 40rpx;
+  border-top: 1rpx solid #f1f5f9;
+}
+.picker-send-btn {
+  width: 100%;
+  height: 88rpx;
+  line-height: 88rpx;
+  background: #f97316;
+  color: #ffffff;
+  font-size: 30rpx;
+  font-weight: bold;
+  border-radius: 44rpx;
+  border: none;
+  text-align: center;
+  padding: 0;
+}
+.picker-send-btn[disabled] {
+  background: #e2e8f0;
+  color: #94a3b8;
+}

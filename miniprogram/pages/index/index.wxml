@@ -1,0 +1,88 @@
+<view class="container">
+  <view class="custom-nav" style="padding-top: {{navTop}}px; height: {{navHeight}}px; box-sizing: content-box;">
+    <view class="nav-title" style="height: {{navHeight}}px; line-height: {{navHeight}}px;">理工布克</view>
+  </view>
+  
+  <view style="height: {{navTop + navHeight}}px; background-color: #f1f5f9;"></view>
+
+  <view class="header">
+    <view class="header-left">
+      <text class="app-name">📚 理工布克</text>
+      <text class="app-sub">让好书找到下一位读者 (极具性价比)</text>
+    </view>
+  </view>
+
+  <view class="search-section">
+    <view class="search-bar">
+      <text class="search-icon">🔍</text>
+      <input 
+        class="search-input" 
+        placeholder="搜书名、作者..." 
+        value="{{searchKey}}" 
+        bindinput="onSearchInput"
+        bindconfirm="onSearch"
+        confirm-type="search"
+      />
+      <view class="search-btn" bindtap="onSearch">搜索</view>
+    </view>
+  </view>
+
+  <scroll-view class="category-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+    <view class="category-list">
+      <view 
+        wx:for="{{categories}}" 
+        wx:key="*this"
+        class="category-item {{currentCategory === item ? 'active' : ''}}"
+        data-category="{{item}}"
+        bindtap="onCategoryTap"
+      >
+        {{item}}
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 公告栏 -->
+  <view class="notice-bar" wx:if="{{announcement}}">
+    <view class="notice-content">
+      <text class="notice-icon">📢</text>
+      <text class="notice-text">{{announcement.content}}</text>
+    </view>
+  </view>
+
+  <view class="book-list" wx:if="{{books.length > 0}}">
+    <view class="book-card" wx:for="{{books}}" wx:key="_id" data-id="{{item._id}}" bindtap="onBookTap">
+      
+      <view class="book-cover-wrap">
+        <image class="book-cover" src="{{item.coverUrl}}" mode="aspectFill" wx:if="{{item.coverUrl}}"></image>
+        <view class="book-cover-placeholder" wx:else>📖</view>
+        <view class="condition-tag {{item.condClass}}">{{item.condition}}</view>
+      </view>
+      
+      <view class="book-info">
+        <text class="book-title">{{item.title}}</text>
+        <text class="book-author">{{item.author || '未知'}}</text>
+        <view class="book-price-row">
+          <text class="book-price">¥{{item.price}}</text>
+          <text class="book-orig" wx:if="{{item.originalPrice}}">¥{{item.originalPrice}}</text>
+        </view>
+        <view class="book-meta">
+          <text class="meta-views">👁 {{item.views || 0}}</text>
+          <text class="meta-category">{{item.category}}</text>
+        </view>
+      </view>
+      
+    </view>
+  </view>
+
+  <view class="empty-state" wx:if="{{books.length === 0 && !loading}}">
+    <text class="empty-icon">🌱</text>
+    <text class="empty-text">星球很荒芜，暂时没有此类书籍</text>
+  </view>
+
+  <view class="loading-state" wx:if="{{loading}}">
+    <text>正在努力加载中...</text>
+  </view>
+  <view class="no-more" wx:if="{{!hasMore && books.length > 0}}">
+    <text>—— 已经到底啦 ——</text>
+  </view>
+</view>

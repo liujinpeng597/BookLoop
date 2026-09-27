@@ -1,0 +1,127 @@
+<view class="container">
+  <view class="custom-nav" style="padding-top: {{navTop}}px; height: {{navHeight}}px;">
+    <view class="nav-title" style="height: {{navHeight}}px; line-height: {{navHeight}}px;">我的</view>
+  </view>
+  
+  <view style="height: {{navTop + navHeight}}px; background-color: #f1f5f9;"></view>
+
+  <view class="profile-header">
+    <view class="avatar-wrap">
+      <button
+        class="avatar-btn {{isAdmin ? 'admin-avatar' : ''}}"
+        open-type="chooseAvatar"
+        bindchooseavatar="onChooseAvatar"
+      >
+        <image
+          wx:if="{{avatarUrl}}"
+          src="{{avatarUrl}}"
+          mode="aspectFill"
+          class="avatar-img"
+        />
+        <text wx:else class="avatar-placeholder">{{isAdmin ? '⚫' : '🧑‍🎓'}}</text>
+      </button>
+    </view>
+
+    <view class="nickname-row" wx:if="{{!isAdmin}}">
+      <input
+        class="nickname-input"
+        type="nickname"
+        value="{{nickName}}"
+        bindinput="onNicknameInput"
+        bindblur="onNicknameSave"
+        placeholder="点击获取微信昵称"
+      />
+    </view>
+    <text class="nickname" wx:else>理工布克 (管理员)</text>
+
+    <view class="admin-tag" wx:if="{{isAdmin}}">Admin</view>
+    <text class="profile-tip" wx:if="{{!isAdmin && !avatarUrl && !nickName}}">点击头像和昵称授权同步</text>
+  </view>
+
+  <block wx:if="{{isAdmin}}">
+    <view class="section-title">管理后台</view>
+    <view class="admin-grid">
+      <view class="admin-card" bindtap="onAdminPublish">
+        <text class="admin-icon">📥</text>
+        <text>发布书籍</text>
+      </view>
+      <view class="admin-card" bindtap="onAdminBooks">
+        <text class="admin-icon">📚</text>
+        <text>在售管理</text>
+      </view>
+      <view class="admin-card" bindtap="onAdminOrders">
+        <text class="admin-icon">📝</text>
+        <text>订单处理</text>
+      </view>
+      <view class="admin-card" bindtap="onAdminAnnouncement">
+        <text class="admin-icon">📢</text>
+        <text>发布公告</text>
+      </view>
+      <view class="admin-card" bindtap="onAdminSettings">
+        <text class="admin-icon">⚙️</text>
+        <text>系统设置</text>
+      </view>
+    </view>
+  </block>
+
+  <block wx:if="{{!isAdmin}}">
+    <view class="section-title" style="margin-top: 40rpx">我的订单</view>
+    
+    <view class="loading" wx:if="{{loading}}">正在刷新订单...</view>
+    
+    <view class="empty" wx:elif="{{orders.length === 0}}">
+      <text class="empty-icon">🛒</text>
+      <text class="empty-text">空空如也，快去挑几本好书吧</text>
+    </view>
+    
+    <view wx:else class="order-list">
+      <view class="order-card" wx:for="{{orders}}" wx:key="_id" bindtap="onOrderTap" data-id="{{item._id}}">
+        <view class="order-header">
+          <text class="order-no">单号: {{item.orderNo}}</text>
+          <text class="order-status status-{{item.status}}">{{statusMap[item.status]}}</text>
+          <text class="pay-tag {{item.paid ? 'paid' : 'unpaid'}}">{{item.paid ? '已付' : '待付'}}</text>
+        </view>
+
+        <!-- 多书订单 -->
+        <block wx:if="{{item.isBatch}}">
+          <view class="batch-books">
+            <view class="batch-book-item" wx:for="{{item.items}}" wx:key="bookId" wx:for-item="bk">
+              <image wx:if="{{bk.coverUrl}}" src="{{bk.coverUrl}}" mode="aspectFill" class="book-thumb-sm"/>
+              <view wx:else class="book-thumb-ph-sm">📖</view>
+              <view class="book-info-sm">
+                <text class="book-title-sm">{{bk.title}}</text>
+                <text class="book-price-sm">¥{{bk.price}}</text>
+              </view>
+            </view>
+          </view>
+          <view class="batch-total">
+            <text>共{{item.items.length}}本 · 总价 ¥{{item.totalPrice}}</text>
+            <text wx:if="{{item.deliveryFee > 0}}" class="fee-tag">含配送费 ¥{{item.deliveryFee}}</text>
+          </view>
+        </block>
+
+        <!-- 单书订单 -->
+        <block wx:else>
+          <view class="order-row">
+            <image wx:if="{{item.bookCover}}" src="{{item.bookCover}}" mode="aspectFill" class="book-thumb"/>
+            <view wx:else class="book-thumb-ph">📖</view>
+            <view class="book-info">
+              <text class="book-title">{{item.bookTitle}}</text>
+              <text class="book-price">¥{{item.price}}</text>
+            </view>
+          </view>
+        </block>
+
+        <view class="order-footer">
+          <text class="delivery-way">交易方式：{{item.deliveryType === 'delivery' ? '送货上门' : '校园自提'}}</text>
+          <text class="delivery-address" wx:if="{{item.address}}">📍 {{item.address}}</text>
+        </view>
+
+        <view class="order-action-row" wx:if="{{item.status === 'completed' || item.status === 'cancelled'}}">
+          <view class="btn-delete" data-id="{{item._id}}" catchtap="onDeleteOrder">删除记录</view>
+        </view>
+      </view>
+    </view>
+  </block>
+
+</view>

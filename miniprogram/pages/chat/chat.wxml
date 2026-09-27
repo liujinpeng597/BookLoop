@@ -1,0 +1,151 @@
+<view class="container">
+  <view class="custom-nav" style="padding-top: {{navTop}}px; height: {{navHeight}}px; box-sizing: content-box;">
+    <view class="nav-back" style="height: {{navHeight}}px;" bindtap="onBackTap">
+      <text class="back-icon">◁</text>
+    </view>
+    <view class="nav-title" style="height: {{navHeight}}px; line-height: {{navHeight}}px;">{{targetName}}</view>
+    <view class="nav-clear" style="height: {{navHeight}}px; line-height: {{navHeight}}px; right: {{navRight}}px;" bindtap="onClearChat">清除记录</view>
+  </view>
+
+  <view style="height: {{navTop + navHeight}}px;"></view>
+
+  <view class="msg-area">
+    <scroll-view
+      id="msg-scroll"
+      class="msg-list"
+      scroll-y
+      scroll-into-view="{{scrollIntoView}}"
+      scroll-with-animation
+      enhanced
+      show-scrollbar="{{false}}"
+      bindscrolltolower="onMsgScrollToLower"
+    >
+    <view class="msg-date-sep" wx:if="{{messages.length === 0}}">
+      <text class="date-text">暂无消息，发送第一条消息吧</text>
+    </view>
+
+    <view
+      wx:for="{{messages}}"
+      wx:key="_id"
+      class="msg-row {{item.isMine ? 'msg-mine' : 'msg-other'}}"
+    >
+      <view class="avatar-box">
+        <text class="avatar-emoji">{{item.isMine ? (isAdmin ? '⚫' : '🧑‍🎓') : (isAdmin ? '🧑‍🎓' : '🎧')}}</text>
+      </view>
+
+      <!-- 普通文本消息 -->
+      <view class="msg-bubble {{item.isMine ? 'bubble-mine' : 'bubble-other'}}" wx:if="{{item.type !== 'order_share'}}">
+        <text class="bubble-text">{{item.content}}</text>
+      </view>
+
+      <!-- 订单分享消息 -->
+      <view class="order-share-wrap" wx:else>
+        <text class="order-share-label">{{item.isMine ? '我分享了订单' : '对方分享了订单'}}</text>
+        <view
+          class="order-card"
+          wx:for="{{item.orders}}"
+          wx:for-item="order"
+          wx:key="orderId"
+          data-order-id="{{order.orderId}}"
+          catchtap="onOrderCardTap"
+        >
+          <view class="order-card-header">
+            <text class="order-card-no">订单号: {{order.orderNo}}</text>
+            <text class="order-card-status status-{{order.status}}">{{statusMap[order.status] || order.status}}</text>
+          </view>
+          <text class="order-card-title">{{order.bookTitle}}</text>
+          <view class="order-card-footer">
+            <text class="order-card-price">¥{{order.price}}</text>
+            <text class="order-card-link">查看详情 →</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+      <view style="height: 30rpx;"></view>
+      <view id="msg-bottom" style="height: 1rpx;"></view>
+    </scroll-view>
+
+    <!-- 新消息提醒气泡 -->
+    <view class="new-msg-pill" wx:if="{{hasNewMsg}}" bindtap="onNewMsgTap">
+      <text class="new-msg-icon">↓</text>
+      <text wx:if="{{newMsgCount > 1}}">{{newMsgCount}} 条新消息</text>
+      <text wx:else>新消息</text>
+    </view>
+  </view>
+
+  <view class="input-bar" style="padding-bottom: calc(36rpx + env(safe-area-inset-bottom) + {{keyboardHeight}}px);">
+    <!-- 表情按钮 -->
+    <view class="emoji-btn {{showEmojiPanel ? 'emoji-btn-active' : ''}}" bindtap="onToggleEmoji">
+      <text>😊</text>
+    </view>
+    <!-- + 按钮：非管理员可分享订单 -->
+    <view class="plus-btn" bindtap="onOpenOrderPicker" wx:if="{{!isAdmin}}">
+      <text>+</text>
+    </view>
+    <input
+      class="msg-input"
+      value="{{inputText}}"
+      bindinput="onInput"
+      placeholder="输入消息..."
+      confirm-type="send"
+      bindconfirm="onSend"
+      adjust-position="{{false}}"
+    />
+    <view class="send-btn {{inputText ? 'send-active' : ''}}" bindtap="onSend">
+      <text>发送</text>
+    </view>
+  </view>
+
+  <!-- 表情面板 -->
+  <view class="emoji-panel" wx:if="{{showEmojiPanel}}">
+    <scroll-view class="emoji-grid" scroll-y>
+      <view
+        wx:for="{{emojiList}}"
+        wx:key="*this"
+        class="emoji-item"
+        data-emoji="{{item}}"
+        bindtap="onEmojiTap"
+      >{{item}}</view>
+    </scroll-view>
+  </view>
+
+  <!-- 订单选择器 -->
+  <view class="order-picker-mask" wx:if="{{showOrderPicker}}" catchtouchmove="noop" catchtap="onCloseOrderPicker">
+    <view class="order-picker" catchtap="noop">
+      <view class="picker-header">
+        <text class="picker-title">选择要分享的订单</text>
+        <text class="picker-cancel" bindtap="onCloseOrderPicker">取消</text>
+      </view>
+
+      <scroll-view class="picker-list" scroll-y>
+        <view wx:if="{{userOrders.length === 0}}" class="picker-empty">暂无订单</view>
+        <view
+          wx:for="{{userOrders}}"
+          wx:key="_id"
+          class="picker-item {{item.selected ? 'picker-item-selected' : ''}}"
+          data-index="{{index}}"
+          bindtap="onToggleOrder"
+        >
+          <view class="picker-checkbox {{item.selected ? 'checked' : ''}}">
+            <text wx:if="{{item.selected}}">✓</text>
+          </view>
+          <view class="picker-order-info">
+            <view class="picker-order-row">
+              <text class="picker-order-no">订单号: {{item.orderNo}}</text>
+              <text class="picker-order-status">{{statusMap[item.status] || item.status}}</text>
+            </view>
+            <text class="picker-order-title">{{item.isBatch ? '多书订单' : (item.bookTitle || '未知书籍')}}</text>
+            <text class="picker-order-price">¥{{item.isBatch ? (item.totalPrice || 0) : (item.price || 0)}}</text>
+          </view>
+        </view>
+      </scroll-view>
+
+      <view class="picker-footer">
+        <button class="picker-send-btn" bindtap="onSendOrders" disabled="{{selectedCount === 0}}">
+          发送 ({{selectedCount}})
+        </button>
+      </view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,87 @@
+<view class="container">
+  <view class="custom-nav" style="padding-top: {{navTop}}px; height: {{navHeight}}px;">
+    <view class="nav-title">书籍编辑</view>
+  </view>
+  
+  <view style="height: {{navTop + navHeight}}px; background-color: #f1f5f9;"></view>
+  
+  <view class="header-section">
+    <view class="page-title">{{bookId ? '修改书籍' : '发布书籍'}}</view>
+    <view class="header-desc">请完善核心信息，Emoji可增加描述感</view>
+  </view>
+
+  <form bindsubmit="onSubmit">
+    <view class="cover-card" bindtap="onUploadCover">
+      <image wx:if="{{tempCoverUrl || coverUrl}}" src="{{tempCoverUrl || coverUrl}}" mode="aspectFill" class="cover-img"/>
+      <view wx:else class="cover-placeholder">
+        <text class="add-icon">+</text>
+        <text class="add-text">点击上传封面</text>
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="input-item">
+        <text class="label">书名 *</text>
+        <input value="{{title}}" data-field="title" bindinput="onInput" placeholder="请输入书名"/>
+      </view>
+      <view class="input-item">
+        <text class="label">作者</text>
+        <input value="{{author}}" data-field="author" bindinput="onInput" placeholder="请输入作者"/>
+      </view>
+      <view class="input-item">
+        <text class="label">ISBN</text>
+        <input value="{{isbn}}" data-field="isbn" bindinput="onInput" placeholder="选填，条形码数字"/>
+        <view class="scan-btn" bindtap="onScanISBN">
+          <text class="scan-icon">📷</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="price-input-row">
+        <view class="price-item">
+          <text class="label">售价 (元) *</text>
+          <input value="{{price}}" type="digit" data-field="price" bindinput="onInput" placeholder="0.00"/>
+        </view>
+        <view class="price-item orig">
+          <text class="label">原价 (元)</text>
+          <input value="{{originalPrice}}" type="digit" data-field="originalPrice" bindinput="onInput" placeholder="0.00"/>
+        </view>
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="picker-item">
+        <text class="label">当前品相 *</text>
+        <picker bindchange="onConditionChange" range="{{conditions}}">
+          <view class="picker-content">{{condition}} ◁</view>
+        </picker>
+      </view>
+      <view class="picker-item">
+        <text class="label">所属分类 *</text>
+        <picker bindchange="onCategoryChange" range="{{categories}}">
+          <view class="picker-content">{{category}} ◁</view>
+        </picker>
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="input-item block">
+        <text class="label">自提地点 *</text>
+        <input value="{{pickupAddress}}" data-field="pickupAddress" bindinput="onInput" placeholder="例如：西区图书馆"/>
+      </view>
+      <view class="desc-item">
+        <text class="label">详细描述 (选填)</text>
+        <textarea value="{{description}}" data-field="description" bindinput="onInput" maxlength="300" placeholder="说说这本书的故事或笔记情况..."/>
+        <text class="word-count">{{description ? description.length : 0}}/300</text>
+      </view>
+    </view>
+
+    <view style="height: 120rpx;"></view>
+
+    <view class="action-bar">
+      <button class="btn-cancel" bindtap="onCancel">取消返回</button>
+      <button class="btn-submit" form-type="submit">确认保存</button>
+    </view>
+  </form>
+</view>

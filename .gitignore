@@ -1,0 +1,18 @@
+# 依赖（云函数在云端安装依赖，无需上传）
+node_modules/
+
+# 微信开发者工具私有配置（个人本地配置，不共享）
+project.private.config.json
+
+# 系统文件
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 日志
+*.log
+
+# 编辑器
+.idea/
+.vscode/
+*.swp

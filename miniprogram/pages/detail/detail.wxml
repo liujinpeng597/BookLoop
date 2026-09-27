@@ -1,0 +1,90 @@
+<view class="container">
+  <view class="custom-nav" style="padding-top: {{navTop}}px; height: {{navHeight}}px;">
+    <view class="nav-back" style="height: {{navHeight}}px;" bindtap="onBackTap">
+      <text class="back-icon">◁</text>
+    </view>
+    <view class="nav-title" style="height: {{navHeight}}px; line-height: {{navHeight}}px;">书籍详情</view>
+  </view>
+
+  <view style="height: {{navTop + navHeight}}px; background-color: #f1f5f9;"></view>
+
+  <view wx:if="{{loading}}" class="loading">加载中...</view>
+
+  <block wx:if="{{!loading && book}}">
+    <view class="cover-area">
+      <image wx:if="{{book.coverUrl}}" src="{{book.coverUrl}}" mode="aspectFill" class="cover-img" />
+      <view wx:else class="cover-placeholder">📖</view>
+    </view>
+
+    <view class="info-card">
+      <text class="title">{{book.title}}</text>
+      <text class="author">{{book.author || '未知作者'}} 著</text>
+
+      <view class="price-row">
+        <text class="price-symbol">¥</text>
+        <text class="price">{{book.price}}</text>
+        <text class="orig-price" wx:if="{{book.originalPrice}}">¥{{book.originalPrice}}</text>
+        <text class="saved-tag" wx:if="{{book.savedAmount}}">省{{book.savedAmount}}元</text>
+      </view>
+
+      <view class="tags-row">
+        <text class="badge badge-default">{{book.views || 0}} 浏览</text>
+        <text class="badge badge-default">{{book.category || '默认分类'}}</text>
+        <text class="badge {{book.condClass || 'badge-default'}}">{{book.condition || '未知品相'}}</text>
+      </view>
+    </view>
+
+    <view class="desc-card">
+      <text class="section-title">书籍描述</text>
+      <text class="desc-text">{{book.description || '卖家很懒，没有留下描述'}}</text>
+    </view>
+
+    <view class="delivery-card" wx:if="{{!isAdmin}}">
+      <text class="section-title">交易方式</text>
+      <radio-group bindchange="onDeliveryTypeChange" class="radio-group">
+        
+        <label class="radio-label">
+          <radio value="pickup" checked="{{deliveryType === 'pickup'}}" color="#f97316"/>
+          🏃 校园自提 (线下交接，免填地址)
+        </label>
+        <view class="pickup-address" wx:if="{{deliveryType === 'pickup'}}">
+          卖家指定地点：{{book.pickupAddress || '西区七公寓512'}}
+        </view>
+        
+        <label class="radio-label">
+          <radio value="delivery" checked="{{deliveryType === 'delivery'}}" color="#f97316"/>
+          🚚 送货上门 (将在下一步填宿舍号)
+        </label>
+        
+      </radio-group>
+    </view>
+
+    <view style="height: 180rpx;"></view>
+  </block>
+</view>
+
+<view class="bottom-bar" wx:if="{{!loading && book}}">
+  
+  <block wx:if="{{isAdmin}}">
+    <view class="admin-actions">
+      <view class="btn-edit" bindtap="onEditTap">编辑书籍</view>
+      <view class="btn-delete" bindtap="onDeleteTap">下架书籍</view>
+    </view>
+  </block>
+  
+  <block wx:else>
+    <view class="user-actions">
+      <view class="contact-btn" bindtap="onContactTap">
+        <text class="contact-icon">💬</text>
+        <text class="contact-text">聊一聊</text>
+      </view>
+      <view class="cart-btn {{book.status !== 'on_sale' ? 'btn-disabled' : ''}}" bindtap="onAddCart">
+        <text>加入购物车</text>
+      </view>
+      <view class="buy-btn {{book.status !== 'on_sale' ? 'buy-btn-disabled' : ''}}" bindtap="onBuyTap">
+        {{book.status === 'on_sale' ? '立即购买' : '已售出'}}
+      </view>
+    </view>
+  </block>
+  
+</view>

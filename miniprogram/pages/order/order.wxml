@@ -1,0 +1,80 @@
+<view class="container">
+  <view class="custom-nav" style="padding-top: {{navTop}}px; height: {{navHeight}}px; box-sizing: content-box;">
+    <view class="nav-back" style="height: {{navHeight}}px;" bindtap="onBackTap">
+      <text class="back-icon">◁</text>
+    </view>
+    <view class="nav-title" style="height: {{navHeight}}px; line-height: {{navHeight}}px;">确认订单</view>
+  </view>
+  <view style="height: {{navTop + navHeight}}px; background-color: #f1f5f9;"></view>
+
+  <!-- 多本书（来自购物车） -->
+  <view class="multi-books" wx:if="{{isCart && books.length > 0}}">
+    <view class="section-label">购买商品 ({{books.length}}件)</view>
+    <view class="book-preview" wx:for="{{books}}" wx:key="_id">
+      <image wx:if="{{item.coverUrl}}" src="{{item.coverUrl}}" mode="aspectFill" class="book-thumb"/>
+      <view wx:else class="book-thumb-ph">📖</view>
+      <view class="book-meta">
+        <text class="book-name">{{item.title}}</text>
+        <text class="book-auth">{{item.condition || ''}}</text>
+        <text class="book-price">¥{{item.price}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 单本书 -->
+  <view class="book-preview" wx:elif="{{book}}">
+    <image wx:if="{{book.coverUrl}}" src="{{book.coverUrl}}" mode="aspectFill" class="book-thumb"/>
+    <view wx:else class="book-thumb-ph">📖</view>
+    <view class="book-meta">
+      <text class="book-name">{{book.title}}</text>
+      <text class="book-auth">{{book.author || '未知作者'}}</text>
+      <text class="book-price">¥{{book.price}}</text>
+    </view>
+  </view>
+
+  <view class="form-card">
+    <text class="section-title">交接与联系信息</text>
+
+    <view class="form-item">
+      <text class="label">真实姓名 *</text>
+      <input class="input" placeholder="请输入您的姓名" data-field="name" bindinput="onInput" value="{{form.name}}"/>
+    </view>
+    <view class="form-item">
+      <text class="label">手机号 *</text>
+      <input class="input" placeholder="请输入11位手机号" type="number" data-field="phone" bindinput="onInput" value="{{form.phone}}"/>
+    </view>
+
+    <block wx:if="{{deliveryType === 'delivery'}}">
+      <view class="form-item">
+        <text class="label">送货上门：收货地址 *</text>
+        <textarea class="textarea" placeholder="请输入具体的宿舍楼栋与寝室号..." data-field="address" bindinput="onInput" value="{{form.address}}"/>
+        <text class="delivery-note">注：女生寝室配送仅送至公寓楼下</text>
+      </view>
+    </block>
+
+    <block wx:else>
+      <view class="form-item">
+        <text class="label">校园自提：卖家指定地点</text>
+        <view class="pickup-display">
+          📍 {{book.pickupAddress || '西区图书馆正门(默认)'}}
+        </view>
+      </view>
+    </block>
+  </view>
+
+  <view style="height: 200rpx;"></view>
+
+  <view class="bottom-bar">
+    <view class="total">
+      <view wx:if="{{deliveryType === 'delivery' && deliveryFee > 0}}" class="fee-line">
+        <text wx:if="{{!isCart}}">书价 ¥{{totalPrice}} + 配送 ¥{{deliveryFee}}</text>
+        <text wx:else>{{books.length}}本 × ¥1 = 配送费 ¥{{deliveryFee}}</text>
+      </view>
+      <text wx:if="{{!isCart}}">合计：<text class="total-price">¥{{finalTotal}}</text></text>
+      <text wx:else>共{{books.length}}件 · <text class="total-price">¥{{finalTotal}}</text></text>
+    </view>
+    <view class="submit-btn {{submitting ? 'btn-disabled' : ''}}" bindtap="onSubmit">
+      {{submitting ? '处理中...' : (isCart ? '提交全部订单' : '提交订单')}}
+    </view>
+  </view>
+</view>
