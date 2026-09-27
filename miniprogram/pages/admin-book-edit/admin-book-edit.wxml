@@ -1,5 +1,8 @@
 <view class="container">
   <view class="custom-nav" style="padding-top: {{navTop}}px; height: {{navHeight}}px;">
+    <view class="nav-back" style="height: {{navHeight}}px;" bindtap="onCancel">
+      <text class="back-icon">◁</text>
+    </view>
     <view class="nav-title">书籍编辑</view>
   </view>
   
@@ -80,7 +83,7 @@
     <view style="height: 120rpx;"></view>
 
     <view class="action-bar">
-      <button class="btn-cancel" bindtap="onCancel">取消返回</button>
+      <button class="btn-cancel" bindtap="onCancel">取消</button>
       <button class="btn-submit" form-type="submit">确认保存</button>
     </view>
   </form>

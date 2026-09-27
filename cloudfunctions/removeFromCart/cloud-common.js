@@ -4,7 +4,7 @@
  * ⚠️ 各云函数目录下的 cloud-common.js 是本文件的同步副本（由 scripts/sync-shared.js 生成）。
  *    修改管理员名单或枚举时：编辑本文件 → 运行 `node scripts/sync-shared.js` → 重新部署云函数。
  */
-const ADMIN_OPENIDS = ['oBpJc7B-M09rkIGtZNN2CgHDN8'] // 管理员 OpenID 白名单（唯一维护点）
+const ADMIN_OPENIDS = ['oBpJc7B-M09rkIGtZNQNn2CgHDN8'] // 管理员 OpenID 白名单（唯一维护点，openid 为固定 28 位）
 
 function isAdminOpenid(openid) {
   return !!openid && ADMIN_OPENIDS.includes(openid)

@@ -5,9 +5,27 @@
   background: #fff; display: flex; align-items: center; padding: 0 24rpx;
   border-bottom: 1rpx solid #e2e8f0;
 }
-.nav-back { display: flex; align-items: center; padding-right: 16rpx; }
-.back-icon { font-size: 34rpx; color: #334155; }
-.nav-title { flex: 1; font-size: 32rpx; font-weight: 600; color: #1e293b; text-align: center; margin-right: 40rpx; }
+.nav-back {
+  position: absolute;
+  left: 0;
+  padding: 0 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.back-icon {
+  font-size: 36rpx;
+  color: #1e293b;
+  font-weight: bold;
+}
+.nav-title {
+  width: 100%;
+  text-align: center;
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #1e293b;
+}
 
 .loading { text-align: center; color: #94a3b8; padding: 120rpx 0; font-size: 28rpx; }
 

@@ -65,6 +65,21 @@
   </block>
 
   <block wx:if="{{!isAdmin}}">
+    <!-- 快捷入口 -->
+    <view class="entry-row">
+      <view class="entry-item" bindtap="onFavorites">
+        <text class="entry-icon">❤️</text>
+        <text class="entry-text">我的收藏</text>
+        <text class="entry-arrow">›</text>
+      </view>
+      <view class="entry-divider"></view>
+      <view class="entry-item" bindtap="onHistory">
+        <text class="entry-icon">🕐</text>
+        <text class="entry-text">浏览历史</text>
+        <text class="entry-arrow">›</text>
+      </view>
+    </view>
+
     <view class="section-title" style="margin-top: 40rpx">我的订单</view>
     
     <view class="loading" wx:if="{{loading}}">正在刷新订单...</view>

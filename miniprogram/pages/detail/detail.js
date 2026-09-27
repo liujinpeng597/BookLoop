@@ -9,7 +9,8 @@ Page({
     isAdmin: false,
     navTop: 0,
     navHeight: 0,
-    deliveryType: 'pickup'
+    deliveryType: 'pickup',
+    isFavorite: false
   },
 
   onLoad(options) {
@@ -20,8 +21,45 @@ Page({
     // 等待登录鉴权完成再读取 isAdmin，避免竞态
     Promise.resolve(app.loginPromise).then(() => {
       this.setData({ isAdmin: app.globalData.isAdmin })
+      if (!app.globalData.isAdmin) this.checkFavorite()
     })
     this.loadDetail()
+  },
+
+  // 查询当前书的收藏状态（管理员无收藏功能）
+  checkFavorite() {
+    if (!this.bookId) return
+    wx.cloud.callFunction({
+      name: 'favorite',
+      data: { action: 'check', bookId: this.bookId },
+      success: res => {
+        if (res.result && res.result.success) {
+          this.setData({ isFavorite: !!res.result.favorite })
+        }
+      },
+      fail: () => {}
+    })
+  },
+
+  // 收藏 / 取消收藏（进行中守卫：连点两次会 toggle 两次互相抵消）
+  onFavTap() {
+    if (!this.data.book || this._favLoading) return
+    this._favLoading = true
+    wx.cloud.callFunction({
+      name: 'favorite',
+      data: { action: 'toggle', bookId: this.bookId },
+      success: res => {
+        if (res.result && res.result.success) {
+          const favorite = !!res.result.favorite
+          this.setData({ isFavorite: favorite })
+          wx.showToast({ title: favorite ? '已加入收藏' : '已取消收藏', icon: 'none' })
+        } else {
+          wx.showToast({ title: (res.result && res.result.msg) || '操作失败', icon: 'none' })
+        }
+      },
+      fail: () => wx.showToast({ title: '网络异常，请稍后再试', icon: 'none' }),
+      complete: () => { this._favLoading = false }
+    })
   },
 
   // 获取书籍详细信息
@@ -39,6 +77,7 @@ Page({
 
           book.condClass = condToClass(book.condition)
           book.pickupAddress = book.pickupAddress || DEFAULT_PICKUP_ADDRESS
+          this.saveHistory(book)
         }
         this.setData({ book, loading: false })
       },
@@ -50,12 +89,27 @@ Page({
     })
   },
 
+  // 记录浏览历史（本地存储，按 bookId 去重，最新在前，最多 30 条）
+  saveHistory(book) {
+    const item = {
+      id: book._id,
+      title: book.title || '未知书名',
+      coverUrl: book.coverUrl || '',
+      price: book.price,
+      condition: book.condition || '',
+      time: Date.now()
+    }
+    let list = wx.getStorageSync('browse_history') || []
+    list = [item].concat(list.filter(x => x.id !== item.id)).slice(0, 30)
+    wx.setStorageSync('browse_history', list)
+  },
+
   // 用户切换交易方式（自提/送货）
   onDeliveryTypeChange(e) {
     this.setData({ deliveryType: e.detail.value })
   },
 
-  // 点击“聊一聊”找客服
+  // 点击”聊一聊”找客服
   onContactTap() {
     if (!this.data.book) return
     Promise.resolve(app.loginPromise).then(() => {
@@ -64,8 +118,10 @@ Page({
         wx.showToast({ title: '登录中，请稍后再试', icon: 'none' })
         return
       }
+      // 带上书名，聊天页自动预填咨询话术，省去买家手打书名
+      const title = encodeURIComponent(this.data.book.title || '')
       wx.navigateTo({
-        url: `/pages/chat/chat?chatId=${chatId}`,
+        url: `/pages/chat/chat?chatId=${chatId}&bookTitle=${title}`,
         fail: () => {
           wx.switchTab({
             url: '/pages/chat-list/chat-list'

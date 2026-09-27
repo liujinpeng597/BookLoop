@@ -1,6 +1,12 @@
 const app = getApp()
 const { condToClass, getNavBarInfo } = require('../../utils/util')
 
+const SORT_OPTIONS = [
+  { key: 'newest', label: '最新' },
+  { key: 'price_asc', label: '价格 ↑' },
+  { key: 'price_desc', label: '价格 ↓' }
+]
+
 Page({
   data: {
     navTop: 0,
@@ -10,12 +16,18 @@ Page({
     categories: ['全部', '教材', '考研', '文学', '生活', '其他'],
     currentCategory: '全部',
     searchKey: '',
+    sortOptions: SORT_OPTIONS,
+    sortBy: 'newest',
 
     page: 1,
     pageSize: 10,
     hasMore: true,
     loading: false,
-    announcement: null
+    announcement: null,
+
+    // 搜索历史（本地存储，最多保留 10 条）
+    searchHistory: [],
+    showHistory: false
   },
 
   onLoad() {
@@ -26,6 +38,10 @@ Page({
     this.setData({ page: 1, hasMore: true })
     this.loadBooks(true)
     this.loadAnnouncement()
+    // 首页可见时同步一次消息未读角标
+    if (typeof app.refreshUnreadBadge === 'function') {
+      app.refreshUnreadBadge()
+    }
   },
 
   loadAnnouncement() {
@@ -44,7 +60,7 @@ Page({
   // 🌟 核心：加载书籍列表
   loadBooks(override = false) {
     if (this.data.loading || !this.data.hasMore) return
-    
+
     this.setData({ loading: true })
 
     wx.cloud.callFunction({
@@ -52,13 +68,14 @@ Page({
       data: {
         category: this.data.currentCategory,
         keyword: this.data.searchKey,
+        sortBy: this.data.sortBy,
         page: this.data.page,
         pageSize: this.data.pageSize
       },
       success: res => {
         if (res.result && res.result.success) {
           const newBooks = res.result.data || []
-          
+
           newBooks.forEach(book => {
             // 未知成色用中性灰样式，不冒充任何具体成色
             book.condClass = condToClass(book.condition, 'cond-other')
@@ -91,7 +108,7 @@ Page({
     this.setData({ searchKey: e.detail.value.trim() })
     if (this._searchTimer) clearTimeout(this._searchTimer)
     this._searchTimer = setTimeout(() => {
-      this.setData({ page: 1, hasMore: true })
+      this.setData({ page: 1, hasMore: true, showHistory: false })
       this.loadBooks(true)
     }, 300)
   },
@@ -99,7 +116,64 @@ Page({
   // 用户点击搜索按钮，或者键盘右下角的搜索键
   onSearch() {
     if (this._searchTimer) clearTimeout(this._searchTimer)
-    this.setData({ page: 1, hasMore: true })
+    this.setData({ page: 1, hasMore: true, showHistory: false })
+    this.saveSearchHistory(this.data.searchKey)
+    this.loadBooks(true)
+  },
+
+  // ---------- 搜索历史 ----------
+  saveSearchHistory(key) {
+    const word = String(key || '').trim()
+    if (!word) return
+    let list = wx.getStorageSync('search_history') || []
+    list = [word].concat(list.filter(item => item !== word)).slice(0, 10)
+    wx.setStorageSync('search_history', list)
+    this.setData({ searchHistory: list })
+  },
+
+  onSearchFocus() {
+    this.setData({
+      searchHistory: wx.getStorageSync('search_history') || [],
+      showHistory: this.data.searchKey === ''
+    })
+  },
+
+  // blur 延迟收起，给历史词的点击留出触发窗口
+  onSearchBlur() {
+    setTimeout(() => {
+      if (!this._historyTapping) this.setData({ showHistory: false })
+      this._historyTapping = false
+    }, 200)
+  },
+
+  onHistoryTap(e) {
+    this._historyTapping = true
+    const word = e.currentTarget.dataset.word
+    this.saveSearchHistory(word)
+    if (this._searchTimer) clearTimeout(this._searchTimer)
+    this.setData({ searchKey: word, showHistory: false, page: 1, hasMore: true })
+    this.loadBooks(true)
+  },
+
+  onClearHistory() {
+    wx.showModal({
+      title: '清空搜索历史',
+      content: '确定清空全部搜索历史吗？',
+      confirmColor: '#ef4444',
+      success: res => {
+        if (res.confirm) {
+          wx.removeStorageSync('search_history')
+          this.setData({ searchHistory: [], showHistory: false })
+        }
+      }
+    })
+  },
+
+  // 用户点击排序选项
+  onSortTap(e) {
+    const sortBy = e.currentTarget.dataset.key
+    if (this.data.sortBy === sortBy) return
+    this.setData({ sortBy, page: 1, hasMore: true })
     this.loadBooks(true)
   },
 
@@ -107,8 +181,8 @@ Page({
   onCategoryTap(e) {
     const category = e.currentTarget.dataset.category
     if (this.data.currentCategory === category) return
-    
-    this.setData({ 
+
+    this.setData({
       currentCategory: category,
       page: 1,
       hasMore: true

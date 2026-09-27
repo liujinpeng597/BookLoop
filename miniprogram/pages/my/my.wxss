@@ -195,6 +195,7 @@ page {
   margin: 0 40rpx 30rpx; 
   padding: 30rpx; 
   box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.03); 
+  transition: transform 0.1s ease;
 }
 
 .order-header { 
@@ -366,4 +367,46 @@ page {
   background: #f1f5f9;
   padding: 4rpx 12rpx;
   border-radius: 8rpx;
+}
+/* 快捷入口（我的收藏等） */
+.entry-row {
+  margin: 24rpx 32rpx 0;
+  background: #ffffff;
+  border-radius: 20rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.03);
+}
+.entry-item {
+  display: flex;
+  align-items: center;
+  padding: 28rpx 28rpx;
+}
+.entry-item:active {
+  background: #f8fafc;
+}
+.entry-icon {
+  font-size: 36rpx;
+  margin-right: 20rpx;
+}
+.entry-text {
+  flex: 1;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1e293b;
+}
+.entry-arrow {
+  font-size: 36rpx;
+  color: #cbd5e1;
+}
+
+/* 订单卡片按压反馈 */
+.order-card:active {
+  transform: scale(0.98);
+  background: #f8fafc;
+}
+
+/* 快捷入口分隔线 */
+.entry-divider {
+  height: 1rpx;
+  background: #f1f5f9;
+  margin: 0 28rpx;
 }

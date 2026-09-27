@@ -27,22 +27,6 @@ page {
   color: #1e293b;
 }
 
-/* Header */
-.header {
-  padding: 24rpx 32rpx 10rpx;
-}
-.app-name {
-  font-size: 44rpx;
-  font-weight: 900;
-  color: #1e293b;
-  display: block;
-}
-.app-sub {
-  font-size: 24rpx;
-  color: #94a3b8;
-  margin-top: 8rpx;
-  display: block;
-}
 
 /* 搜索栏 */
 .search-section {
@@ -84,6 +68,66 @@ page {
 }
 .search-btn:active {
   opacity: 0.8;
+}
+
+/* 搜索历史 */
+.history-panel {
+  margin-top: 16rpx;
+  background: #ffffff;
+  border-radius: 20rpx;
+  padding: 20rpx 24rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.03);
+}
+.history-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.history-title {
+  font-size: 26rpx;
+  font-weight: bold;
+  color: #1e293b;
+}
+.history-clear {
+  font-size: 24rpx;
+  color: #94a3b8;
+}
+.history-chips {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 16rpx;
+}
+.history-chip {
+  padding: 10rpx 24rpx;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 24rpx;
+  border-radius: 26rpx;
+  margin: 0 16rpx 16rpx 0;
+}
+.history-chip:active {
+  background: #ffedd5;
+  color: #f97316;
+}
+
+/* 排序栏 */
+.sort-bar {
+  display: flex;
+  align-items: center;
+  padding: 0 32rpx 16rpx;
+}
+.sort-item {
+  font-size: 26rpx;
+  color: #64748b;
+  margin-right: 36rpx;
+  padding: 6rpx 4rpx;
+  border-bottom: 4rpx solid transparent;
+  transition: all 0.2s ease;
+}
+.sort-item.active {
+  color: #f97316;
+  font-weight: bold;
+  border-bottom-color: #f97316;
 }
 
 /* 分类 Tab */

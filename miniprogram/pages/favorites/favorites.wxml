@@ -1,0 +1,47 @@
+<view class="container">
+  <view class="custom-nav" style="padding-top: {{navTop}}px; height: {{navHeight}}px;">
+    <view class="nav-back" style="height: {{navHeight}}px;" bindtap="onBackTap">
+      <text class="back-icon">◁</text>
+    </view>
+    <view class="nav-title" style="height: {{navHeight}}px; line-height: {{navHeight}}px;">我的收藏</view>
+  </view>
+
+  <view style="height: {{navTop + navHeight}}px; background-color: #f1f5f9;"></view>
+
+  <view class="fav-list" wx:if="{{favorites.length > 0}}">
+    <view class="fav-card" wx:for="{{favorites}}" wx:key="_id" data-id="{{item._id}}" bindtap="onBookTap">
+      <view class="book-cover-wrap">
+        <image class="book-cover" src="{{item.coverUrl}}" mode="aspectFill" wx:if="{{item.coverUrl}}"></image>
+        <view class="book-cover-placeholder" wx:else>📖</view>
+        <view class="condition-tag {{item.condClass}}">{{item.condition}}</view>
+      </view>
+
+      <view class="book-info">
+        <text class="book-title">{{item.title}}</text>
+        <text class="book-author">{{item.author || '未知'}}</text>
+        <view class="book-price-row">
+          <text class="book-price">¥{{item.price}}</text>
+          <text class="book-orig" wx:if="{{item.originalPrice}}">¥{{item.originalPrice}}</text>
+        </view>
+        <text class="off-shelf-tag" wx:if="{{item.offShelf}}">已售出 / 已下架</text>
+      </view>
+
+      <view class="fav-remove" data-id="{{item._id}}" data-index="{{index}}" catchtap="onRemoveFav">💔
+        <text class="fav-remove-text">取消</text>
+      </view>
+    </view>
+
+    <view class="load-more">
+      {{loadingMore ? '加载中...' : (hasMore ? '上拉加载更多' : '—— 没有更多了 ——')}}
+    </view>
+  </view>
+
+  <view class="empty-state" wx:if="{{favorites.length === 0 && !loading}}">
+    <text class="empty-icon">🤍</text>
+    <text class="empty-text">还没有收藏，去首页挑几本心仪的好书吧</text>
+  </view>
+
+  <view class="loading-state" wx:if="{{loading}}">
+    <text>正在加载收藏...</text>
+  </view>
+</view>

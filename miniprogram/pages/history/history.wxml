@@ -1,0 +1,35 @@
+<view class="container">
+  <view class="custom-nav" style="padding-top: {{navTop}}px; height: {{navHeight}}px;">
+    <view class="nav-back" style="height: {{navHeight}}px;" bindtap="onBackTap">
+      <text class="back-icon">◁</text>
+    </view>
+    <view class="nav-title" style="height: {{navHeight}}px; line-height: {{navHeight}}px;">浏览历史</view>
+    <view class="nav-clear {{list.length === 0 ? 'nav-clear-disabled' : ''}}" style="height: {{navHeight}}px; line-height: {{navHeight}}px;" bindtap="onClearAll">清空</view>
+    <view class="nav-capsule-gap" style="width: {{navRight}}px;"></view>
+  </view>
+
+  <view style="height: {{navTop + navHeight}}px; background-color: #f1f5f9;"></view>
+
+  <view class="history-list" wx:if="{{list.length > 0}}">
+    <view class="history-card" wx:for="{{list}}" wx:key="id" data-id="{{item.id}}" bindtap="onBookTap">
+      <view class="book-cover-wrap">
+        <image class="book-cover" src="{{item.coverUrl}}" mode="aspectFill" wx:if="{{item.coverUrl}}"></image>
+        <view class="book-cover-placeholder" wx:else>📖</view>
+        <view class="condition-tag {{item.condClass}}">{{item.condition}}</view>
+      </view>
+
+      <view class="book-info">
+        <text class="book-title">{{item.title}}</text>
+        <text class="book-price">¥{{item.price}}</text>
+        <text class="book-time">🕐 {{item.timeStr}}</text>
+      </view>
+    </view>
+
+    <view class="list-foot">—— 最多保留最近 30 条 ——</view>
+  </view>
+
+  <view class="empty-state" wx:if="{{list.length === 0}}">
+    <text class="empty-icon">👁</text>
+    <text class="empty-text">还没有浏览记录，去首页逛逛吧</text>
+  </view>
+</view>

@@ -13,6 +13,8 @@ Page({
   },
 
   onShow() {
+    // 进入消息页即视为已读：更新本地已读水位，清除 tabBar 角标
+    app.markChatsRead()
     Promise.resolve(app.loginPromise).then(() => {
       this.loadConversations()
     })

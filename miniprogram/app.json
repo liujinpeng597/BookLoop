@@ -13,7 +13,9 @@
     "pages/order-detail/order-detail",
     "pages/payment/payment",
     "pages/admin-announcement/admin-announcement",
-    "pages/admin-settings/admin-settings"
+    "pages/admin-settings/admin-settings",
+    "pages/favorites/favorites",
+    "pages/history/history"
   ],
   "window": {
     "navigationBarBackgroundColor": "#ffffff",

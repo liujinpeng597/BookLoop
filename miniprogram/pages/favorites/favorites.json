@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "我的收藏",
+  "navigationBarBackgroundColor": "#f1f5f9",
+  "navigationBarTextStyle": "black",
+  "backgroundColor": "#f1f5f9",
+  "enablePullDownRefresh": true
+}

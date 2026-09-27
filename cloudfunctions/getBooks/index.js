@@ -43,11 +43,19 @@ exports.main = async (event) => {
       query.title = db.RegExp({ regexp: escaped, options: 'i' })
     }
 
+    // 排序：白名单映射，防止任意字段/注入风险；默认最新上架在前
+    const SORT_MAP = {
+      newest: ['createTime', 'desc'],
+      price_asc: ['price', 'asc'],
+      price_desc: ['price', 'desc']
+    }
+    const [orderField, orderDir] = SORT_MAP[event.sortBy] || SORT_MAP.newest
+
     // 并行取当前页与总数，供前端判断是否还有更多
     const [res, totalRes] = await Promise.all([
       db.collection('books')
         .where(query)
-        .orderBy('createTime', 'desc')
+        .orderBy(orderField, orderDir)
         .skip((page - 1) * pageSize)
         .limit(pageSize)
         .get(),

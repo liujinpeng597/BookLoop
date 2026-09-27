@@ -1,36 +1,48 @@
 <view class="container">
   <view class="custom-nav" style="padding-top: {{navTop}}px; height: {{navHeight}}px; box-sizing: content-box;">
-    <view class="nav-title" style="height: {{navHeight}}px; line-height: {{navHeight}}px;">理工布克</view>
+    <view class="nav-title" style="height: {{navHeight}}px; line-height: {{navHeight}}px;">首页</view>
   </view>
-  
-  <view style="height: {{navTop + navHeight}}px; background-color: #f1f5f9;"></view>
 
-  <view class="header">
-    <view class="header-left">
-      <text class="app-name">📚 理工布克</text>
-      <text class="app-sub">让好书找到下一位读者 (极具性价比)</text>
-    </view>
-  </view>
+  <view style="height: {{navTop + navHeight}}px; background-color: #f1f5f9;"></view>
 
   <view class="search-section">
     <view class="search-bar">
       <text class="search-icon">🔍</text>
-      <input 
-        class="search-input" 
-        placeholder="搜书名、作者..." 
-        value="{{searchKey}}" 
+      <input
+        class="search-input"
+        placeholder="搜书名、作者..."
+        value="{{searchKey}}"
         bindinput="onSearchInput"
         bindconfirm="onSearch"
+        bindfocus="onSearchFocus"
+        bindblur="onSearchBlur"
         confirm-type="search"
       />
       <view class="search-btn" bindtap="onSearch">搜索</view>
+    </view>
+
+    <!-- 搜索历史 -->
+    <view class="history-panel" wx:if="{{showHistory && searchHistory.length > 0}}">
+      <view class="history-head">
+        <text class="history-title">搜索历史</text>
+        <text class="history-clear" bindtap="onClearHistory">🗑 清空</text>
+      </view>
+      <view class="history-chips">
+        <view
+          class="history-chip"
+          wx:for="{{searchHistory}}"
+          wx:key="*this"
+          data-word="{{item}}"
+          bindtap="onHistoryTap"
+        >{{item}}</view>
+      </view>
     </view>
   </view>
 
   <scroll-view class="category-scroll" scroll-x enhanced show-scrollbar="{{false}}">
     <view class="category-list">
-      <view 
-        wx:for="{{categories}}" 
+      <view
+        wx:for="{{categories}}"
         wx:key="*this"
         class="category-item {{currentCategory === item ? 'active' : ''}}"
         data-category="{{item}}"
@@ -40,6 +52,17 @@
       </view>
     </view>
   </scroll-view>
+
+  <!-- 排序栏 -->
+  <view class="sort-bar">
+    <view
+      wx:for="{{sortOptions}}"
+      wx:key="key"
+      class="sort-item {{sortBy === item.key ? 'active' : ''}}"
+      data-key="{{item.key}}"
+      bindtap="onSortTap"
+    >{{item.label}}</view>
+  </view>
 
   <!-- 公告栏 -->
   <view class="notice-bar" wx:if="{{announcement}}">

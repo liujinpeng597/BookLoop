@@ -74,6 +74,10 @@
   
   <block wx:else>
     <view class="user-actions">
+      <view class="icon-btn" bindtap="onFavTap">
+        <text class="icon-btn-icon">{{isFavorite ? '❤️' : '🤍'}}</text>
+        <text class="icon-btn-text">{{isFavorite ? '已收藏' : '收藏'}}</text>
+      </view>
       <view class="contact-btn" bindtap="onContactTap">
         <text class="contact-icon">💬</text>
         <text class="contact-text">聊一聊</text>

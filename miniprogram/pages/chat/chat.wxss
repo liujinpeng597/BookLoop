@@ -41,20 +41,20 @@ page {
   font-weight: bold;
 }
 .nav-clear {
-  position: absolute;
-  /* right 由内联样式根据胶囊按钮位置动态计算，避免与微信自带胶囊重叠 */
-  padding: 0 32rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
+  flex-shrink: 0;
+  padding: 0 8rpx 0 24rpx;
   color: #64748b;
   font-size: 26rpx;
 }
+.nav-capsule-gap {
+  flex-shrink: 0;
+}
 .nav-title {
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   box-sizing: border-box;
-  padding: 0 220rpx;
+  /* 左侧给绝对定位的返回键留位；标题在"返回键 ↔ 清除记录"之间居中，超长自动省略 */
+  padding-left: 90rpx;
   text-align: center;
   font-size: 34rpx;
   font-weight: bold;

@@ -1,6 +1,6 @@
 <view class="container">
   <view class="custom-nav" style="padding-top: {{navTop}}px; height: {{navHeight}}px; box-sizing: content-box;">
-    <view class="nav-title" style="height: {{navHeight}}px; line-height: {{navHeight}}px;">理工布克</view>
+    <view class="nav-title" style="height: {{navHeight}}px; line-height: {{navHeight}}px;">消息</view>
   </view>
 
   <view style="height: {{navTop + navHeight}}px; background-color: #f1f5f9;"></view>

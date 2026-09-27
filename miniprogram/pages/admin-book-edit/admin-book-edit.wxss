@@ -20,6 +20,20 @@ page {
   box-sizing: content-box;
 }
 
+.nav-back {
+  position: absolute;
+  left: 0;
+  padding: 0 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.back-icon {
+  font-size: 36rpx;
+  color: #1e293b;
+  font-weight: bold;
+}
 .nav-title {
   width: 100%;
   text-align: center;

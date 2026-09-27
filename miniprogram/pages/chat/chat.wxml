@@ -4,7 +4,9 @@
       <text class="back-icon">◁</text>
     </view>
     <view class="nav-title" style="height: {{navHeight}}px; line-height: {{navHeight}}px;">{{targetName}}</view>
-    <view class="nav-clear" style="height: {{navHeight}}px; line-height: {{navHeight}}px; right: {{navRight}}px;" bindtap="onClearChat">清除记录</view>
+    <view class="nav-clear" style="height: {{navHeight}}px; line-height: {{navHeight}}px;" bindtap="onClearChat">清除记录</view>
+    <!-- 占位：宽度 = 胶囊按钮及其右边距，把"清除记录"顶到胶囊左侧，标题在剩余空间居中，互不重叠 -->
+    <view class="nav-capsule-gap" style="width: {{navRight}}px;"></view>
   </view>
 
   <view style="height: {{navTop + navHeight}}px;"></view>

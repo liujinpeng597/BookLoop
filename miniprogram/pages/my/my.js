@@ -22,6 +22,10 @@ Page({
   },
 
   onShow() {
+    // 「我的」页可见时同步一次消息未读角标
+    if (typeof app.refreshUnreadBadge === 'function') {
+      app.refreshUnreadBadge()
+    }
     Promise.resolve(app.loginPromise).then(() => {
       const isAdmin = app.globalData.isAdmin
       this.setData({
@@ -32,6 +36,10 @@ Page({
       if (!isAdmin) {
         this.loadMyOrders()
       }
+    }).catch(err => {
+      // 登录失败时 isAdmin 保持 false，页面会退回普通用户视图——这里把原因显式暴露出来
+      console.error('登录失败，身份信息不可用（管理后台/订单将不显示）:', err)
+      wx.showToast({ title: '登录失败，请检查网络与云函数', icon: 'none' })
     })
   },
 
@@ -158,6 +166,14 @@ Page({
     if (orderId) {
       wx.navigateTo({ url: `/pages/order-detail/order-detail?id=${orderId}` })
     }
+  },
+
+  onFavorites() {
+    wx.navigateTo({ url: '/pages/favorites/favorites' })
+  },
+
+  onHistory() {
+    wx.navigateTo({ url: '/pages/history/history' })
   },
 
   onDeleteOrder(e) {

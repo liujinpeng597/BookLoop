@@ -4,6 +4,25 @@
 > 审查维度：安全性 / 健壮性 / 逻辑性 / 风格。
 > 问题编号规则：`S`=安全，`R`=健壮，`L`=逻辑，`T`=风格。严重度：🔴 高 / 🟠 中 / 🟡 低 / ℹ️ 提示。
 
+## 🔄 第三轮审查（功能迭代后）
+
+**范围**：新增的 `favorite`、`getUnreadCount` 云函数，`getBooks` 排序参数，前端改动页（index/detail/chat/chat-list/my/app.js）与新增页（favorites/history）。
+
+**本轮修复**：
+
+| 问题 | 维度 | 修复 |
+| --- | --- | --- |
+| 🔴 管理员白名单 openid 在第二轮集中化时被抄错：28 位截断为 26 位（丢 `Q`、`n`），重新部署 login 后 `isAdmin` 恒为 false，管理界面消失 | L | `shared/cloud-common.js` 已按初始提交与控制台实测 openid 修正为 28 位，`sync-shared.js` 已下发并程序化校验 29 个目录 |
+| 🟠 `app.js refreshUnreadBadge` 依赖 `callFunction` 返回 Promise 调 `.catch`，旧基础库下带 success 回调时不返回 Promise，`.catch` 抛 TypeError | R | 补 `fail: () => {}` 回调兜底 |
+| 🟡 详情页收藏按钮连点两次触发两次 toggle，净效果互相抵消，看似"点了没反应" | L | 加 `_favLoading` 进行中守卫（`complete` 释放） |
+| 🟡 `index.js onHistoryTap` 连续两次 setData | T | 合并为一次 |
+
+**已知可接受项（记录不修）**：
+
+- `favorite` toggle 的"检查-再写入"存在并发窗口，极端连点可能产生重复收藏记录；下次 toggle 的 `remove` 会按 where 清掉全部重复，自愈。彻底方案是 openid+bookId 唯一索引（控制台配置）。
+- 未读角标的已读水位存客户端本地（`chat_read_ts`，客户端时钟），与云端 `createTime` 比较存在时钟偏差可能；校园单设备场景影响可忽略。
+- `getUnreadCount` 的 or 聚合查询建议在控制台为 `chat_messages` 增加 `(chatId, createTime)` 组合索引；`favorites` 增加 `(openid, bookId)` 唯一索引（同时解决上一条的并发窗口）。
+
 ## ✅ 修复状态（第二轮提交）
 
 本报告中的全部问题已在后续提交中修复完毕。修复要点与对应编号：

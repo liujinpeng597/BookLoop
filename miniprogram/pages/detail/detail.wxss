@@ -226,7 +226,7 @@ page {
   flex-direction: column; 
   align-items: center; 
   justify-content: center; 
-  margin-right: 48rpx; 
+  margin-right: 32rpx; 
 }
 .contact-icon { 
   font-size: 44rpx; 
@@ -273,4 +273,21 @@ page {
   background: #cbd5e1 !important;
   color: #ffffff !important;
   box-shadow: none !important;
+}
+/* 收藏按钮（与聊一聊同为图标+文字竖排） */
+.icon-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-right: 32rpx;
+}
+.icon-btn-icon {
+  font-size: 44rpx;
+  margin-bottom: 4rpx;
+}
+.icon-btn-text {
+  font-size: 22rpx;
+  color: #64748b;
+  font-weight: 500;
 }

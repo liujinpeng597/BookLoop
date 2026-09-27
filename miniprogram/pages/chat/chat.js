@@ -42,6 +42,12 @@ Page({
   onLoad(options) {
     this.chatId = options.chatId || ''
     this.userOpenId = ''
+    // 详情页"聊一聊"带进来的书名：空会话时自动预填咨询话术
+    try {
+      this.pendingBookTitle = options.bookTitle ? decodeURIComponent(options.bookTitle) : ''
+    } catch (e) {
+      this.pendingBookTitle = ''
+    }
 
     this.setData(getNavBarInfo())
 
@@ -74,11 +80,14 @@ Page({
 
   onHide() {
     this._stopPolling()
+    // 离开聊天页时，会话内的消息都已读，刷新本地已读水位并清角标
+    app.markChatsRead()
   },
 
   onUnload() {
     wx.offKeyboardHeightChange()
     this._stopPolling()
+    app.markChatsRead()
   },
 
   _startPolling() {
@@ -155,6 +164,11 @@ Page({
           this.setData({ targetName: res.result.targetNickName })
         } else if (this.data.isAdmin && !(res.result && res.result.targetNickName)) {
           this.setData({ targetName: '同学_' + this.chatId.slice(-4) })
+        }
+        // 空会话 + 带了书名 → 预填一句咨询话术，只填一次
+        if (messages.length === 0 && this.pendingBookTitle && !this._prefilled) {
+          this._prefilled = true
+          this.setData({ inputText: `你好，我想咨询《${this.pendingBookTitle}》这本书~` })
         }
         this._needRefresh = false
         this.setData({ messages }, () => {
